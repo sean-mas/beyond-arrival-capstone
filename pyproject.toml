@@ -1,0 +1,73 @@
+[project]
+name = "companion"
+version = "0.1.0"
+description = "Beyond Arrival: a white-label companion for a relocating family, months three to twelve"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2",
+    "pydantic-settings",
+    "sqlalchemy>=2",
+    "psycopg[binary]",
+    "pgvector",
+    # store.py and lexical.py import it directly. It was only ever present
+    # because a dev tool pulled it in, so the Render image, which installs
+    # exactly this list, failed on the first chat turn. 25.09.2026.
+    "numpy",
+    "langgraph",
+    "langchain-core",
+    "httpx",
+    "apscheduler",
+    "python-frontmatter",
+    "langfuse",
+]
+
+[project.optional-dependencies]
+# What the evals need and the running app does not. Kept out of the image.
+eval = [
+    "scikit-learn",
+]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+    "ruff",
+    "mypy",
+    "pre-commit",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# The demo page ships inside the package, or `pip install .` in the Docker
+# image leaves /chat serving a missing file.
+[tool.setuptools.package-data]
+companion = ["api/static/*", "api/static/intro/*"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+# Prose is the author's. ruff format normalises Python inside fenced blocks and
+# strips the column alignment that makes the asymmetric gate readable.
+extend-exclude = ["*.md", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+packages = ["companion"]
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# So a bare `pytest` works before `pip install -e .` has been run. The first
+# thing a new checkout does should not be an import error.
+pythonpath = ["src"]
+addopts = "-q"

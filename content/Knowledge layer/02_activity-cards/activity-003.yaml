@@ -1,0 +1,41 @@
+id: IC-ACT-003
+title: "Virtual Exchange: Artifact Analysis"
+type: facilitated_activity
+source:
+  source_id: SRC-VE-COIL-2026
+  locator: "Standard Virtual Exchange Pattern"
+  use: "original synthesis"
+competencies:
+  - cultural_knowledge
+  - behavioral_flexibility
+  - digital_communication
+learning_objectives:
+  - "Negotiate meaning across cultures using asynchronous digital tools."
+  - "Examine cultural values embedded in everyday objects or practices."
+audience:
+  experience_level: [intermediate]
+  settings: [higher_education, global_teams]
+delivery:
+  duration_minutes: 120 # spread over 1 week
+  group_size: "Pairs"
+  modality: [asynchronous_online]
+facilitation:
+  preparation: 
+    - "Pair participants from different cultural/geographic contexts."
+  steps: 
+    - "1. Participants upload a photo of an object that represents 'professionalism' in their context."
+    - "2. Partners ask 3 clarifying questions before making any assumptions."
+    - "3. Partners record a short video explaining their object based on the questions asked."
+  debrief_questions: 
+    - "How did the medium (asynchronous text vs video) affect your understanding?"
+    - "What invisible values were embedded in the physical artifacts?"
+equity_and_safety:
+  risks: ["Socioeconomic disparities revealed through artifacts."]
+  adaptations: ["Keep prompts broad enough that they don't require expensive or status-based objects."]
+evidence:
+  observable_behaviors: ["Uses clarifying questions; avoids premature evaluation."]
+assessment:
+  method: "portfolio/artifact review"
+related:
+  frameworks: [IC-FWK-DIGITAL-001]
+tags: [virtual_exchange, digital, asynchronous, artifacts]

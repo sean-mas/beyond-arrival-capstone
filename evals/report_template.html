@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eval Explorer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap">
+<style>
+:root{
+  --paper:#f5f7f7; --surface:#ffffff; --ink:#15191b; --muted:#5d696d; --faint:#8b989c;
+  --line:#dfe5e6; --line-soft:#eceff0; --accent:#14635f; --accent-tint:#e4efee;
+  --pass:#1f7a6f; --missed:#c0392b; --false:#e0822a; --refusal:#8e44ad;
+  --retrieval:#c9971a; --ungrounded:#56708a; --unscored:#c5ced0; --absent:#eef1f1;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:"Source Serif 4",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0f1315; --surface:#181e21; --ink:#e6ebea; --muted:#9aa7ab; --faint:#6f7c80;
+  --line:#2a3337; --line-soft:#222a2d; --accent:#6cbdb5; --accent-tint:#1d2e2d;
+  --pass:#4fb3a5; --missed:#ff6b5b; --false:#f5a55c; --refusal:#c38ae0;
+  --retrieval:#e6bc4a; --ungrounded:#8fa8c2; --unscored:#46525a; --absent:#1c2326;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--sans)}
+header{padding:22px 28px 14px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 28px;align-items:flex-end}
+h1{font:500 26px/1.1 var(--serif);margin:0}
+.meta{color:var(--muted);font-size:13px}
+.warn{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--missed);border:1px solid currentColor;border-radius:3px;padding:3px 7px}
+.controls{margin-left:auto;display:flex;gap:14px;align-items:center;font-size:13px;color:var(--muted)}
+select,input[type=search]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:5px 8px}
+main{padding:18px 28px 60px;display:flex;flex-direction:column;gap:26px}
+h2{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 12px 6px 0;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom-color:var(--line)}
+tr.sel td{background:var(--accent-tint)}
+tr[data-run]{cursor:pointer}
+td.num{text-align:right;padding-right:18px}
+.bad{color:var(--missed);font-weight:600}
+/* matrix */
+.matrix{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;align-items:center}
+.mlabel{font:12px var(--mono);color:var(--muted);white-space:nowrap;cursor:pointer}
+.mlabel.sel{color:var(--ink);font-weight:500}
+.cells{display:flex;gap:1px}
+.gap{width:8px;flex:none}
+.cell{width:9px;height:18px;flex:none;border-radius:1px;cursor:pointer;background:var(--absent)}
+.cell:hover{outline:2px solid var(--ink);outline-offset:0}
+.cell.cur{outline:2px solid var(--ink)}
+.setlabels{display:flex;gap:1px;font:10px var(--mono);color:var(--faint)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.o-pass{background:var(--pass)}.o-missed_escalation{background:var(--missed)}.o-false_escalation{background:var(--false)}
+.o-refusal_error{background:var(--refusal)}.o-retrieval_miss{background:var(--retrieval)}.o-ungrounded{background:var(--ungrounded)}
+.o-unscored{background:var(--unscored)}.o-absent{background:var(--absent)}
+/* workbench */
+.bench{display:grid;grid-template-columns:minmax(240px,1fr) minmax(360px,1.6fr) minmax(260px,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){.bench{grid-template-columns:1fr}}
+.list{max-height:640px;overflow-y:auto;display:flex;flex-direction:column}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.item{display:grid;grid-template-columns:12px 44px 1fr;gap:8px;align-items:baseline;padding:7px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:13px}
+.item:hover{background:var(--line-soft)}.item.sel{background:var(--accent-tint)}
+.item i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.item b{font:500 12px var(--mono)}
+.item span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q{font:400 17px/1.45 var(--serif);margin:0 0 6px}
+.sub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.step{font:600 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.chunks{display:flex;flex-direction:column;gap:4px}
+.chunk{display:grid;grid-template-columns:22px 70px 1fr auto;gap:8px;align-items:baseline;font-size:13px;padding:5px 8px;border-radius:4px;background:var(--paper)}
+.chunk.want{box-shadow:inset 3px 0 0 var(--pass)}
+.chunk .r{font:12px var(--mono);color:var(--faint)}.chunk .c{font:12px var(--mono)}
+.chunk .s{font:11px var(--mono);color:var(--muted)}
+.missing{font-size:13px;color:var(--missed)}.missing s{font-family:var(--mono);font-size:12px}
+.answer{font:400 15px/1.55 var(--serif);border-left:3px solid var(--line);padding:4px 0 4px 14px;margin:0;white-space:pre-wrap}
+.answer.none{color:var(--faint);font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 11px var(--mono);padding:3px 8px;border-radius:3px;background:var(--line-soft);color:var(--muted)}
+.vrow{display:grid;grid-template-columns:96px 1fr 1fr;gap:6px 10px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+.vrow .k{font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ok{color:var(--pass);font-weight:500}.no{color:var(--missed);font-weight:600}
+.why{margin-top:12px;padding:10px 12px;border-radius:4px;background:var(--paper);font-size:13px}
+.why ul{margin:6px 0 0;padding-left:18px}
+.notes{font-size:13px;color:var(--muted);margin-top:12px}
+.across{display:flex;gap:2px;margin-top:6px}.across .cell{width:14px;height:14px}
+#flow svg{width:100%;height:auto;display:block}
+.flowmsg{color:var(--faint);font-size:13px}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none!important}}
+@keyframes flow{to{stroke-dashoffset:-24}}
+.pulse{animation:flow 1.4s linear infinite}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Eval Explorer</h1><div class="meta" id="meta"></div></div>
+  <span class="warn">local only · harvested text + model answers · never publish</span>
+  <div class="controls">
+    <label><input type="checkbox" id="small"> show runs under 20 cases</label>
+  </div>
+</header>
+<main>
+  <section><h2>Runs · click a row to inspect it</h2><div class="panel scroll"><table id="summary"></table></div></section>
+  <section><h2>Every case, every run · one square per case</h2>
+    <div class="panel scroll"><div class="matrix" id="matrix"></div><div class="legend" id="legend"></div></div></section>
+  <section><h2 id="benchTitle">Case</h2>
+    <div class="bench">
+      <div class="panel">
+        <div class="filters">
+          <select id="fSet"><option value="">all sets</option><option>core</option><option>adversarial</option><option>holdout</option></select>
+          <select id="fOut"><option value="">all outcomes</option><option value="fail">failures only</option></select>
+          <input type="search" id="fText" placeholder="search text or id" size="14">
+        </div>
+        <div class="list" id="list"></div>
+      </div>
+      <div class="panel" id="trace"></div>
+      <div class="panel" id="verdicts"></div>
+    </div>
+  </section>
+  <section><h2>Flow for the selected run · expected situation → first card retrieved → outcome</h2>
+    <div class="panel" id="flow"><p class="flowmsg">loading…</p></div></section>
+</main>
+<script>const DATA = __DATA__;</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script>
+const OUT = {
+  pass:"passed", missed_escalation:"missed escalation", false_escalation:"false escalation",
+  refusal_error:"refusal error", retrieval_miss:"retrieval miss", ungrounded:"ungrounded",
+  unscored:"nothing to score", absent:"not in this run"
+};
+const FAIL = new Set(["missed_escalation","false_escalation","refusal_error","retrieval_miss","ungrounded"]);
+const cases = DATA.cases, cards = DATA.cards, R = DATA.results;
+const caseById = Object.fromEntries(cases.map(c => [c.id, c]));
+const S = {run:null, caseId:null, small:false};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const pct = (a,b) => b ? (100*a/b).toFixed(0)+"%" : "–";
+const outcome = (run, cid) => R[run]?.[cid]?.v?.outcome ?? "absent";
+const visibleRuns = () => DATA.runs.filter(r => S.small || r.n >= 20);
+
+function stats(run){
+  let ep=0, ec=0, fe=0, rc=0, rn=0, hn=0, hh=0, sn=0, sh=0, g=[], n=0;
+  for (const c of cases){
+    const r = R[run.id]?.[c.id]; if (!r?.v) continue; n++; const v = r.v;
+    if (c.expect_escalation){ ep++; if (v.escalation==="correct") ec++; }
+    if (v.escalation==="false") fe++;
+    if (v.refusal){ rn++; if (v.refusal==="correct") rc++; }
+    if (v.retrieval){ hn++; if (v.retrieval==="hit") hh++; }
+    if (v.situation){ sn++; if (v.situation==="hit") sh++; }
+    if (r.groundedness!=null) g.push(r.groundedness);
+  }
+  return {n, rec:pct(ec,ep), recLow: ep && ec/ep < .9, fe, ref:pct(rc,rn), hit:pct(hh,hn), sit:pct(sh,sn),
+          g: g.length ? (g.reduce((a,b)=>a+b,0)/g.length).toFixed(2) : "–"};
+}
+
+function renderSummary(){
+  let h = `<tr><th>run</th><th>kind</th><th class="num">cases</th><th class="num">escalation recall</th>
+    <th class="num">false escalations</th><th class="num">refusal correct</th><th class="num">retrieval hit</th>
+    <th class="num">situation hit</th><th class="num">groundedness</th></tr>`;
+  for (const run of visibleRuns()){
+    const s = stats(run);
+    h += `<tr data-run="${run.id}" class="${run.id===S.run?"sel":""}"><td>${esc(run.label)}</td><td>${run.kind}</td>
+      <td class="num">${s.n}</td><td class="num ${s.recLow?"bad":""}">${s.rec}</td><td class="num">${s.fe}</td>
+      <td class="num">${s.ref}</td><td class="num">${s.hit}</td><td class="num">${s.sit}</td>
+      <td class="num">${s.g}${run.judged?"":""}</td></tr>`;
+  }
+  $("summary").innerHTML = h;
+  $("summary").querySelectorAll("tr[data-run]").forEach(tr => tr.onclick = () => select(tr.dataset.run, S.caseId));
+}
+
+function renderMatrix(){
+  const sets = ["core","adversarial","holdout"];
+  const grouped = sets.map(s => cases.filter(c => c.set===s));
+  let h = `<div></div><div class="setlabels">${grouped.map((g,i) =>
+    `<span style="width:${g.length*10-1}px">${sets[i]} · ${g.length}</span>${i<2?'<span class="gap"></span>':""}`).join("")}</div>`;
+  const counts = {};
+  for (const run of visibleRuns()){
+    h += `<div class="mlabel ${run.id===S.run?"sel":""}" data-run="${run.id}">${esc(run.label)}</div><div class="cells">`;
+    grouped.forEach((g,i) => {
+      for (const c of g){
+        const o = outcome(run.id, c.id);
+        if (run.id===S.run) counts[o] = (counts[o]||0)+1;
+        const cur = run.id===S.run && c.id===S.caseId ? " cur" : "";
+        h += `<div class="cell o-${o}${cur}" data-run="${run.id}" data-case="${c.id}" title="${c.id} · ${OUT[o]}\n${esc(c.input.slice(0,120))}"></div>`;
+      }
+      if (i<2) h += `<span class="gap"></span>`;
+    });
+    h += `</div>`;
+  }
+  $("matrix").innerHTML = h;
+  $("matrix").querySelectorAll(".cell").forEach(el => el.onclick = () => select(el.dataset.run, el.dataset.case));
+  $("matrix").querySelectorAll(".mlabel").forEach(el => el.onclick = () => select(el.dataset.run, S.caseId));
+  $("legend").innerHTML = Object.keys(OUT).map(o =>
+    `<span><i class="o-${o}"></i>${OUT[o]}${counts[o] ? ` <b>${counts[o]}</b>` : ""}</span>`).join("") +
+    `<span style="margin-left:auto">counts are for the selected run</span>`;
+}
+
+function renderList(){
+  const fs = $("fSet").value, fo = $("fOut").value, ft = $("fText").value.toLowerCase();
+  const rows = cases.filter(c => (!fs || c.set===fs)
+    && (!fo || FAIL.has(outcome(S.run, c.id)))
+    && (!ft || c.id.includes(ft) || c.input.toLowerCase().includes(ft)));
+  $("list").innerHTML = rows.map(c => `<div class="item ${c.id===S.caseId?"sel":""}" data-case="${c.id}">
+      <i class="o-${outcome(S.run,c.id)}"></i><b>${c.id}</b><span>${esc(c.input)}</span></div>`).join("")
+    || `<p class="flowmsg">no case matches</p>`;
+  $("list").querySelectorAll(".item").forEach(el => el.onclick = () => select(S.run, el.dataset.case));
+}
+
+function renderTrace(){
+  const c = caseById[S.caseId], r = R[S.run]?.[c.id], run = DATA.runs.find(x => x.id===S.run);
+  $("benchTitle").textContent = `Case ${c.id} · ${c.set}${c.attack_class ? " · "+c.attack_class : ""} · in ${run.label}`;
+  let h = `<p class="q">${esc(c.input)}</p><p class="sub">${c.provenance||""}${c.expect_situation ? " · expected situation <b>"+esc(c.expect_situation)+"</b>" : ""}</p>`;
+  if (!r){ $("trace").innerHTML = h + `<p class="answer none">This case is not in the selected run.</p>`; return; }
+  if (r.question && r.question !== c.input) h += `<div class="step">what the model saw, after redaction</div><p class="sub">${esc(r.question)}</p>`;
+  h += `<div class="step">retrieved, in rank order${r.top_score!=null ? ` · top score ${r.top_score.toFixed(3)}`:""}${r.margin!=null ? ` · margin ${r.margin.toFixed(3)}`:""}</div>`;
+  const got = r.chunks.map(ch => ch.split("#")[0]);
+  if (!r.chunks.length) h += `<p class="sub">no retrieval: this run stopped before the retriever, or ran the guards only.</p>`;
+  else h += `<div class="chunks">${r.chunks.map((ch,i) => { const id = ch.split("#")[0], k = cards[id]||{};
+      const want = c.must_cite.includes(id);
+      return `<div class="chunk ${want?"want":""}"><span class="r">#${i+1}</span><span class="c">${want?"★ ":""}${esc(ch)}</span>
+        <span>${esc(k.title||"")}</span><span class="s">${esc(k.situation||"")}</span></div>`; }).join("")}</div>`;
+  const missing = c.must_cite.filter(id => !got.includes(id));
+  if (r.chunks.length && missing.length) h += `<p class="missing">expected but not retrieved: ${missing.map(id =>
+      `<s>${id}</s> ${esc(cards[id]?.title||"")}`).join(" · ")}</p>`;
+  h += `<div class="step">route: ${esc(r.route||"–")}${r.refusal_reason ? " · refusal: "+esc(r.refusal_reason) : ""}</div>`;
+  h += r.answer ? `<p class="answer">${esc(r.answer)}</p>` : `<p class="answer none">No answer text. ${r.escalated?"Escalated to a human.":r.refused?"Refused.":""}</p>`;
+  $("trace").innerHTML = h;
+}
+
+function vcell(label, exp, got, ok){
+  return `<div class="vrow"><span class="k">${label}</span><span>expected <b>${esc(exp)}</b></span>
+    <span class="${ok===true?"ok":ok===false?"no":""}">got ${esc(got)}</span></div>`;
+}
+function renderVerdicts(){
+  const c = caseById[S.caseId], r = R[S.run]?.[c.id], v = r?.v || {};
+  const o = v.outcome || "absent";
+  let h = `<div class="chips" style="margin-bottom:10px"><span class="chip o-${o}" style="color:#fff">${OUT[o]}</span></div>`;
+  if (r){
+    if (c.expect_escalation!=null) h += vcell("escalate", c.expect_escalation?"yes":"no", r.escalated?"yes":"no", v.escalation?v.escalation==="correct":null);
+    if (c.expect_refusal!=null) h += vcell("refuse", c.expect_refusal?"yes":"no", r.refused?"yes":"no", v.refusal?v.refusal==="correct":null);
+    if (v.retrieval) h += vcell("retrieval", c.must_cite.join(", "), v.hit_rank ? "rank "+v.hit_rank : "not in top "+r.chunks.length, v.retrieval==="hit");
+    if (v.situation) h += vcell("situation", c.expect_situation, cards[r.chunks[0]?.split("#")[0]]?.situation||"–", v.situation==="hit");
+    const j = [["grounded",r.groundedness],["relevant",r.relevance],["tone",r.tone]].filter(x => x[1]!=null);
+    if (j.length) h += `<div class="vrow"><span class="k">judge</span><span style="grid-column:span 2">${j.map(([k,x]) => `${k} <b>${x.toFixed(2)}</b>`).join(" · ")}</span></div>`;
+    if (r.latency_ms) h += `<div class="vrow"><span class="k">latency</span><span style="grid-column:span 2">${(r.latency_ms/1000).toFixed(1)} s</span></div>`;
+    if (v.escalation==="missed" || v.escalation==="false"){
+      const rules = c.must_cite.flatMap(id => (cards[id]?.escalate_if||[]).map(x => [id,x]));
+      if (rules.length) h += `<div class="why"><b>What the cited cards say should escalate</b><ul>${rules.map(([id,x]) => `<li>${esc(x)} <span class="s">(${id})</span></li>`).join("")}</ul></div>`;
+    }
+  }
+  if (c.notes) h += `<p class="notes"><b>Case note.</b> ${esc(c.notes)}</p>`;
+  h += `<div class="step">this case across every run</div><div class="across">${visibleRuns().map(run =>
+      `<div class="cell o-${outcome(run.id,c.id)} ${run.id===S.run?"cur":""}" data-run="${run.id}" title="${esc(run.label)} · ${OUT[outcome(run.id,c.id)]}"></div>`).join("")}</div>`;
+  $("verdicts").innerHTML = h;
+  $("verdicts").querySelectorAll(".across .cell").forEach(el => el.onclick = () => select(el.dataset.run, S.caseId));
+}
+
+function renderFlow(){
+  const box = $("flow");
+  if (!window.d3 || !d3.sankey){ box.innerHTML = `<p class="flowmsg">The flow chart needs an internet connection for d3. Everything above works offline.</p>`; return; }
+  const links = {}, nodes = new Map();
+  const node = (id, name, col) => { if (!nodes.has(id)) nodes.set(id, {id, name, col}); return id; };
+  for (const c of cases){
+    const r = R[S.run]?.[c.id]; if (!r?.v || !r.chunks.length) continue;
+    const a = node("s:"+(c.expect_situation||"none"), c.expect_situation || "(no situation)", 0);
+    const card = r.chunks[0].split("#")[0];
+    const b = node("c:"+card, card+" "+(cards[card]?.title||"").slice(0,34), 1);
+    const o = node("o:"+r.v.outcome, OUT[r.v.outcome], 2);
+    links[a+"|"+b] = (links[a+"|"+b]||0)+1; links[b+"|"+o] = (links[b+"|"+o]||0)+1;
+  }
+  if (!nodes.size){ box.innerHTML = `<p class="flowmsg">This run has no retrieval to draw: pick a generation or baseline run above.</p>`; return; }
+  const W = Math.max(900, box.clientWidth - 36), H = Math.max(360, nodes.size * 15);
+  const cs = getComputedStyle(document.documentElement), col = n => cs.getPropertyValue(n).trim();
+  const colour = id => id.startsWith("o:") ? col("--"+({pass:"pass",missed_escalation:"missed",false_escalation:"false",refusal_error:"refusal",retrieval_miss:"retrieval",ungrounded:"ungrounded"}[id.slice(2)]||"unscored")) : col("--faint");
+  const g = d3.sankey().nodeId(d => d.id).nodeWidth(10).nodePadding(6).extent([[1,4],[W-260,H-4]])({
+    nodes: [...nodes.values()].map(d => ({...d})),
+    links: Object.entries(links).map(([k,v]) => { const [s,t] = k.split("|"); return {source:s, target:t, value:v}; })
+  });
+  const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role","img")
+    .attr("aria-label","Flow from expected situation to first retrieved card to outcome for the selected run");
+  const path = d3.sankeyLinkHorizontal();
+  svg.append("g").attr("fill","none").selectAll("path").data(g.links).join("path")
+    .attr("d", path).attr("stroke", d => colour(d.target.id)).attr("stroke-opacity", .28).attr("stroke-width", d => Math.max(1, d.width))
+    .append("title").text(d => `${d.source.name} → ${d.target.name}: ${d.value}`);
+  svg.append("g").attr("fill","none").selectAll("path").data(g.links).join("path")
+    .attr("d", path).attr("class","pulse").attr("stroke", d => colour(d.target.id)).attr("stroke-opacity", .9)
+    .attr("stroke-width", 1.4).attr("stroke-dasharray","3 9");
+  svg.append("g").selectAll("rect").data(g.nodes).join("rect")
+    .attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1-d.x0).attr("height", d => Math.max(1,d.y1-d.y0))
+    .attr("fill", d => colour(d.id)).append("title").text(d => `${d.name}: ${d.value}`);
+  svg.append("g").attr("font-family", col("--mono") || "monospace").attr("font-size", 11).attr("fill", col("--ink"))
+    .selectAll("text").data(g.nodes).join("text")
+    .attr("x", d => d.x1 + 6).attr("y", d => (d.y0+d.y1)/2).attr("dy","0.35em").text(d => `${d.name}  ${d.value}`);
+  box.replaceChildren(svg.node());
+}
+
+function select(run, caseId){
+  S.run = run;
+  if (!caseId) caseId = (cases.find(c => FAIL.has(outcome(run, c.id))) || cases[0]).id;
+  S.caseId = caseId;
+  renderSummary(); renderMatrix(); renderList(); renderTrace(); renderVerdicts(); renderFlow();
+}
+
+$("meta").textContent = `generated ${DATA.generated} · ${cases.length} cases · ${DATA.runs.length} runs · ${Object.keys(cards).length} cards`;
+$("small").onchange = e => { S.small = e.target.checked; if (!visibleRuns().some(r => r.id===S.run)) S.run = visibleRuns()[0]?.id; select(S.run, S.caseId); };
+["fSet","fOut","fText"].forEach(id => $(id).oninput = renderList);
+const first = DATA.runs.find(r => r.kind==="generation" && r.n >= 100) || DATA.runs[0];
+select(first.id, null);
+</script>
+</body>
+</html>

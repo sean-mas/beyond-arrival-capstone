@@ -1,0 +1,43 @@
+id: IC-ACT-001
+title: "Perspective-Taking Under Ambiguity"
+type: facilitated_activity
+source:
+  source_id: SRC-BERARDO-DEARDORFF-2012-SYNTHESIS
+  locator: "Abstracted methodology"
+  use: "private retrieval and original synthesis"
+competencies:
+  - self_awareness
+  - perspective_taking
+  - tolerance_for_ambiguity
+learning_objectives:
+  - "Distinguish observation from interpretation and evaluation."
+  - "Generate multiple plausible meanings for ambiguous behavior."
+audience:
+  experience_level: [beginner, intermediate]
+  settings: [global_teams, higher_education, trainer_workshop]
+delivery:
+  duration_minutes: 45
+  group_size: "6-24"
+  modality: [in_person, hybrid, online]
+facilitation:
+  preparation: 
+    - "Select a highly ambiguous photo or short text scenario lacking clear cultural context."
+  steps: 
+    - "1. Display the ambiguous stimulus for 2 minutes."
+    - "2. Ask participants to write down exactly what is happening."
+    - "3. Have participants share. Categorize their responses into: Observation, Interpretation, or Evaluation."
+    - "4. Introduce the OIE (Observe, Interpret, Evaluate) framework."
+  debrief_questions: 
+    - "How quickly did we jump from observation to evaluation?"
+    - "What cultural lenses influenced your interpretation?"
+    - "How can we apply a 'pause' in our daily work before evaluating?"
+equity_and_safety:
+  risks: ["Participants may project harmful biases onto the ambiguous stimulus."]
+  adaptations: ["Ensure the stimulus does not depict a marginalized group in a potentially triggering way."]
+evidence:
+  observable_behaviors: ["Participant explicitly separates facts from feelings/judgments in discussion."]
+assessment:
+  method: "facilitator observation + learner reflection"
+related:
+  frameworks: [IC-FWK-CORE-001, IC-FWK-REFLECTION-001]
+tags: [ambiguity, reflection, communication]

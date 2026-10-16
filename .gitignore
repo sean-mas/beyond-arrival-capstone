@@ -1,0 +1,39 @@
+# The market test: 35 named companies with direct mobile numbers, one named
+# person's verbatim email, and the pricing model. Ignored HERE so that a clone
+# of the published repository cannot reacquire it by accident. The personal
+# repository still tracks it, deliberately: see private/README.md.
+private/
+
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Eval results are written by evals.yml and read by the gate. Regenerated, and
+# large enough to bury a diff.
+evals/results/
+
+# Long runs write here. Detached, so the output has to land somewhere.
+logs-*.log
+
+.DS_Store
+.$*.drawio.bkp
+.$*.drawio.dtmp
+
+# Photographic textures for the river game, fetched by game/tools/fetch_assets.py (CC0)
+game/assets/
+# The React intro's build tools; the built bundle lives in src/companion/api/static/intro/
+web/node_modules/
+# Preview stills from the river game's render mode (game/tools/render_capture.py)
+game/.preview/

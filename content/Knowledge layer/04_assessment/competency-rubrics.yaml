@@ -1,0 +1,29 @@
+# Competency Rubrics
+rubrics:
+  - domain: "Cognitive"
+    competency: "Cultural Self-Awareness"
+    levels:
+      developing: "Describes own culture as the 'normal' or default way of doing things."
+      intermediate: "Recognizes own cultural values and biases but struggles to see how they impact others."
+      advanced: "Critically analyzes own positionality and power; anticipates how own cultural lens affects interactions."
+      
+  - domain: "Affective"
+    competency: "Tolerance for Ambiguity"
+    levels:
+      developing: "Shows frustration or anxiety when cultural rules are unclear; seeks immediate certainty."
+      intermediate: "Manages discomfort in ambiguous situations but relies heavily on facilitator for answers."
+      advanced: "Functions comfortably in highly ambiguous intercultural contexts; treats uncertainty as a learning opportunity."
+
+  - domain: "Behavioral"
+    competency: "Perspective-Taking"
+    levels:
+      developing: "Interprets others' behavior strictly through own cultural lens."
+      intermediate: "Can generate alternative cultural explanations when prompted."
+      advanced: "Routinely and spontaneously analyzes situations from multiple cultural viewpoints before acting."
+
+  - domain: "Communicative"
+    competency: "Interactional Adaptation"
+    levels:
+      developing: "Uses a single communication style regardless of the audience."
+      intermediate: "Adapts language speed or formality when obvious misunderstandings occur."
+      advanced: "Seamlessly shifts communicative style (direct/indirect, pacing, non-verbals) to achieve shared meaning and preserve dignity."

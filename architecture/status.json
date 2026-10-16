@@ -1,0 +1,617 @@
+{
+  "_about": "Source of truth for build status. architecture/build_map.py checks every evidence path exists and bakes this into build-map.html. Update a node here when it lands; do not edit the HTML. pos is [x, z] on its layer's plane.",
+  "updated": "2026-09-29",
+  "layers": {
+    "c1": {
+      "label": "Capstone 1",
+      "when": "now to Fri 16.10.2026"
+    },
+    "it2": {
+      "label": "Iteration 2",
+      "when": "capstone 1, after the 02.10 freeze"
+    },
+    "c2": {
+      "label": "Capstone 2",
+      "when": "February 2027"
+    },
+    "later": {
+      "label": "Later",
+      "when": "after a first customer"
+    }
+  },
+  "nodes": [
+    {
+      "id": "family",
+      "label": "Family / visitor",
+      "layer": "c1",
+      "status": "actor",
+      "pos": [
+        -420,
+        0
+      ],
+      "evidence": null,
+      "metric": "the person asking",
+      "next": null
+    },
+    {
+      "id": "chat",
+      "label": "Family companion page",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -300,
+        0
+      ],
+      "evidence": "src/companion/api/static/app.html",
+      "metric": "onboarding · journey · checklist · chat with inspector · on this laptop",
+      "next": "Render still serves the 25.09 page: redeploy with the next export."
+    },
+    {
+      "id": "api",
+      "label": "FastAPI app",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -180,
+        0
+      ],
+      "evidence": "src/companion/api/app.py",
+      "metric": "/chat · /api/chat · /api/config · /healthz · passcode · rate limit",
+      "next": "Telegram webhook when the channel lands."
+    },
+    {
+      "id": "guard_in",
+      "label": "Guardrails in",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -60,
+        0
+      ],
+      "evidence": "src/companion/guardrails/crisis.py",
+      "metric": "handoff recall 0.865 local · 0.622 as deployed (Groq) · PII 8/8 · refusal 1.000",
+      "next": "the handover definition is Sean's open call; refusal misses h007, h008 on fresh posts; a hosted llama3.1:8b would close the live gap."
+    },
+    {
+      "id": "agent",
+      "label": "Agent graph",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        70,
+        0
+      ],
+      "core": true,
+      "evidence": "src/companion/agent/graph.py",
+      "metric": "LangGraph, 7 nodes · prompt v3 · router sees the material",
+      "next": "prompt v4 ideas from labelling, 29.09: guiding questions, a PII notice in code, memory, no projecting a card's situation."
+    },
+    {
+      "id": "guard_out",
+      "label": "Guardrails out",
+      "layer": "c1",
+      "status": "partial",
+      "pos": [
+        200,
+        0
+      ],
+      "evidence": "src/companion/guardrails/groundedness.py",
+      "metric": "bans + groundedness gate live · judged quality unverified",
+      "next": "a blocked answer should send the card passage plus a next step, not a refusal line."
+    },
+    {
+      "id": "cards",
+      "label": "20 situation cards",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -180,
+        -150
+      ],
+      "evidence": "content/cards/card_001_anmeldung_chain.md",
+      "metric": "20 of 20, validated",
+      "next": "the long pole is done. Next cards come from gaps the evals show."
+    },
+    {
+      "id": "ingest",
+      "label": "Ingest · chunk · embed",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -60,
+        -150
+      ],
+      "evidence": "src/companion/retrieval/ingest.py",
+      "metric": "bge-m3 · local Ollama, Hugging Face on Render (parity 0.99999)",
+      "next": null
+    },
+    {
+      "id": "pg",
+      "label": "Postgres + pgvector",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        70,
+        -150
+      ],
+      "evidence": "docker-compose.yml",
+      "metric": "local pgvector · Neon Frankfurt for the deploy",
+      "next": null
+    },
+    {
+      "id": "retrieval",
+      "label": "Retrieval",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        200,
+        -150
+      ],
+      "evidence": "src/companion/retrieval/store.py",
+      "metric": "tenant-scoped · TF-IDF control",
+      "next": null
+    },
+    {
+      "id": "llm",
+      "label": "LLM backends",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        70,
+        150
+      ],
+      "evidence": "src/companion/llm/ollama.py",
+      "metric": "Ollama Cloud · Groq · Hugging Face · Mistral · local Ollama as the offline fallback",
+      "next": null
+    },
+    {
+      "id": "obs",
+      "label": "Trace sink",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        200,
+        150
+      ],
+      "evidence": "src/companion/obs/sink.py",
+      "metric": "every turn to JSONL",
+      "next": null
+    },
+    {
+      "id": "evals",
+      "label": "Eval harness",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        330,
+        0
+      ],
+      "evidence": "evals/run_generation.py",
+      "metric": "115 cases + 24 held-out · 35 runs · tiers 2 and 3 as deployed, 29.09",
+      "next": "rejudge the two live runs once a judge passes calibration."
+    },
+    {
+      "id": "baseline0",
+      "label": "Baseline 0",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        330,
+        -150
+      ],
+      "evidence": "evals/run_baseline0.py",
+      "metric": "hit@1 0.548, no LLM",
+      "next": null
+    },
+    {
+      "id": "explorer",
+      "label": "Eval Explorer",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        330,
+        150
+      ],
+      "evidence": "evals/report.py",
+      "metric": "every case, every run",
+      "next": null
+    },
+    {
+      "id": "corpus",
+      "label": "Corpus Graph",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        330,
+        290
+      ],
+      "evidence": "evals/corpus_graph.py",
+      "metric": "case to card, per run",
+      "next": null
+    },
+    {
+      "id": "docker",
+      "label": "Docker image",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -300,
+        150
+      ],
+      "evidence": "Dockerfile",
+      "metric": "app + pgvector locally",
+      "next": null
+    },
+    {
+      "id": "deploy",
+      "label": "Deploy",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        -180,
+        150
+      ],
+      "evidence": "render.yaml",
+      "metric": "Render free, Frankfurt · Neon · passcode · build of 25.09",
+      "next": "crisis check is Groq qwen3.8-27b: recall 0.622 vs 0.865 locally, disclosed. The family companion ships with the next deploy."
+    },
+    {
+      "id": "ci_gate",
+      "label": "CI eval gate",
+      "layer": "c1",
+      "status": "partial",
+      "pos": [
+        -60,
+        150
+      ],
+      "evidence": "quality-gate/github-workflows/evals.yml",
+      "metric": "written, not active",
+      "next": "needs a calibrated judge before its thresholds mean anything."
+    },
+    {
+      "id": "langfuse",
+      "label": "Langfuse",
+      "layer": "c1",
+      "status": "built",
+      "pos": [
+        200,
+        290
+      ],
+      "evidence": "src/companion/obs/tracing.py",
+      "metric": "self-hosted locally · Cloud EU from Render only",
+      "next": null
+    },
+    {
+      "id": "telegram",
+      "label": "Telegram",
+      "layer": "it2",
+      "status": "planned",
+      "pos": [
+        -180,
+        0
+      ],
+      "evidence": "src/companion/channels/__init__.py",
+      "metric": "empty stub",
+      "next": "free, no per-message cost."
+    },
+    {
+      "id": "scheduler",
+      "label": "Scheduler",
+      "layer": "it2",
+      "status": "planned",
+      "pos": [
+        70,
+        0
+      ],
+      "evidence": "src/companion/scheduler/__init__.py",
+      "metric": "empty stub",
+      "next": "the monthly nudge. The real mechanism for the month-four family."
+    },
+    {
+      "id": "prefect",
+      "label": "Prefect",
+      "layer": "c2",
+      "status": "planned",
+      "pos": [
+        -60,
+        -150
+      ],
+      "evidence": null,
+      "metric": "orchestration",
+      "next": null
+    },
+    {
+      "id": "mlflow",
+      "label": "MLflow",
+      "layer": "c2",
+      "status": "planned",
+      "pos": [
+        330,
+        0
+      ],
+      "evidence": null,
+      "metric": "model registry",
+      "next": null
+    },
+    {
+      "id": "grafana",
+      "label": "Prometheus + Grafana",
+      "layer": "c2",
+      "status": "planned",
+      "pos": [
+        -180,
+        150
+      ],
+      "evidence": null,
+      "metric": "golden signals, one alert",
+      "next": null
+    },
+    {
+      "id": "evidently",
+      "label": "Evidently",
+      "layer": "c2",
+      "status": "planned",
+      "pos": [
+        200,
+        150
+      ],
+      "evidence": null,
+      "metric": "input drift",
+      "next": null
+    },
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp",
+      "layer": "later",
+      "status": "planned",
+      "pos": [
+        -180,
+        0
+      ],
+      "evidence": null,
+      "metric": "the cost driver",
+      "next": "per-message pricing since 01.10.2026. Model it before quoting."
+    },
+    {
+      "id": "provider",
+      "label": "Provider dashboard",
+      "layer": "later",
+      "status": "planned",
+      "pos": [
+        70,
+        0
+      ],
+      "evidence": null,
+      "metric": "uptake, flags, consultant queue",
+      "next": null
+    },
+    {
+      "id": "judge",
+      "label": "LLM judge",
+      "layer": "c1",
+      "status": "partial",
+      "pos": [
+        460,
+        0
+      ],
+      "evidence": "evals/judge.py",
+      "metric": "rubric r2, 30 tier-2-live answers: 97% raw agreement on grounded, κ 0.00 / 0.21 / 0.38 at best (gate 0.6)",
+      "next": "kappa paradox: 29 of 30 answers labelled grounded. The sheet needs more 'no' examples, then rejudge."
+    },
+    {
+      "id": "ui",
+      "label": "Chat UI redesign",
+      "layer": "it2",
+      "status": "built",
+      "pos": [
+        -60,
+        -150
+      ],
+      "evidence": "src/companion/api/static/app.css",
+      "metric": "family view · inspector view · handover card · arrival at Kaub",
+      "next": "built 28 and 29.09, on this laptop only until the next deploy."
+    },
+    {
+      "id": "checklist",
+      "label": "Family checklist",
+      "layer": "it2",
+      "status": "built",
+      "pos": [
+        200,
+        0
+      ],
+      "evidence": "src/companion/api/static/data.js",
+      "metric": "dates count from the moving day · facts from the cards · kept on the device",
+      "next": "the scheduler's reminders will read from it."
+    },
+    {
+      "id": "memory",
+      "label": "Conversation memory",
+      "layer": "it2",
+      "status": "planned",
+      "pos": [
+        -60,
+        150
+      ],
+      "evidence": "docs/product/prompt-v4-ideas.md",
+      "metric": "the companion forgets the previous message",
+      "next": "found 29.09: history is declared but no node reads it. Needed before guiding questions."
+    },
+    {
+      "id": "wiki_mcp",
+      "label": "Wiki over MCP · optional",
+      "layer": "it2",
+      "status": "planned",
+      "pos": [
+        200,
+        -150
+      ],
+      "evidence": "content/Knowledge layer/00_governance/scope-and-non-goals.md",
+      "metric": "intercultural competence wiki written: 21 files, own gold Q&A · not connected yet",
+      "next": "optional: serve the wiki over MCP as a tool the model chooses to call, and test it against RAG on the same cases."
+    }
+  ],
+  "edges": [
+    {
+      "source": "family",
+      "target": "chat",
+      "flow": true
+    },
+    {
+      "source": "chat",
+      "target": "api",
+      "flow": true
+    },
+    {
+      "source": "api",
+      "target": "guard_in",
+      "flow": true
+    },
+    {
+      "source": "guard_in",
+      "target": "agent",
+      "flow": true
+    },
+    {
+      "source": "agent",
+      "target": "retrieval",
+      "flow": true
+    },
+    {
+      "source": "retrieval",
+      "target": "pg",
+      "flow": true
+    },
+    {
+      "source": "agent",
+      "target": "llm",
+      "flow": true
+    },
+    {
+      "source": "agent",
+      "target": "guard_out",
+      "flow": true
+    },
+    {
+      "source": "guard_out",
+      "target": "evals",
+      "flow": false
+    },
+    {
+      "source": "cards",
+      "target": "ingest",
+      "flow": true
+    },
+    {
+      "source": "ingest",
+      "target": "pg",
+      "flow": true
+    },
+    {
+      "source": "agent",
+      "target": "obs",
+      "flow": true
+    },
+    {
+      "source": "obs",
+      "target": "explorer",
+      "flow": true
+    },
+    {
+      "source": "evals",
+      "target": "explorer",
+      "flow": true
+    },
+    {
+      "source": "evals",
+      "target": "corpus",
+      "flow": false
+    },
+    {
+      "source": "baseline0",
+      "target": "evals",
+      "flow": false
+    },
+    {
+      "source": "obs",
+      "target": "langfuse",
+      "flow": false
+    },
+    {
+      "source": "docker",
+      "target": "deploy",
+      "flow": false
+    },
+    {
+      "source": "ci_gate",
+      "target": "evals",
+      "flow": false
+    },
+    {
+      "source": "telegram",
+      "target": "api",
+      "flow": false
+    },
+    {
+      "source": "scheduler",
+      "target": "agent",
+      "flow": false
+    },
+    {
+      "source": "prefect",
+      "target": "ingest",
+      "flow": false
+    },
+    {
+      "source": "mlflow",
+      "target": "evals",
+      "flow": false
+    },
+    {
+      "source": "grafana",
+      "target": "api",
+      "flow": false
+    },
+    {
+      "source": "evidently",
+      "target": "obs",
+      "flow": false
+    },
+    {
+      "source": "whatsapp",
+      "target": "api",
+      "flow": false
+    },
+    {
+      "source": "provider",
+      "target": "obs",
+      "flow": false
+    },
+    {
+      "source": "evals",
+      "target": "judge"
+    },
+    {
+      "source": "chat",
+      "target": "ui"
+    },
+    {
+      "source": "checklist",
+      "target": "scheduler"
+    },
+    {
+      "source": "ui",
+      "target": "checklist"
+    },
+    {
+      "source": "memory",
+      "target": "agent",
+      "flow": false
+    },
+    {
+      "source": "wiki_mcp",
+      "target": "agent",
+      "flow": false
+    }
+  ]
+}

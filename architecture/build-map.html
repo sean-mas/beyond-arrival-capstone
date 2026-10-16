@@ -1,0 +1,412 @@
+<meta charset="utf-8">
+<title>Companion Build Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap">
+<style>
+:root{
+  --ground:#080d12; --stage:#0b1219; --side:#0e151c; --card:#131c24; --line:#1f2c35; --line-soft:#17222a;
+  --ink:#e8edf0; --muted:#93a1ab; --faint:#5f6e78;
+  --built:#4fb3a5; --partial:#e6bc4a; --planned:#8494a2; --actor:#dfe4e7; --flow:#ffb36b; --warn:#ff8a73;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:"Source Serif 4",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:14px/1.5 var(--sans)}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 360px;height:min(88vh,860px);min-height:560px;border-bottom:1px solid var(--line)}
+.stage{position:relative;overflow:hidden;background:
+  radial-gradient(80% 70% at 45% 55%,#10212a 0%,var(--stage) 60%,var(--ground) 100%)}
+/* isolate: three.js gives every label a large z-index; keep them inside the stage */
+#gl{position:absolute;inset:0;isolation:isolate;z-index:0}
+.hint{position:absolute;left:18px;bottom:14px;z-index:1;font:11px var(--mono);color:var(--faint);pointer-events:none}
+.side{background:var(--side);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow-y:auto}
+.block{padding:18px 20px;border-bottom:1px solid var(--line-soft)}
+.eyebrow{font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+h1{font:500 26px/1.1 var(--serif);margin:0 0 6px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0;font-size:13px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.m{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+.m b{display:block;font:500 16px/1.25 var(--mono);font-variant-numeric:tabular-nums}
+.m span{font:500 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.m.warn{border-color:#5a2d26}.m.warn b{color:var(--warn)}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg+.seg{margin-top:8px}
+.seg button{flex:1;font:500 11px var(--mono);letter-spacing:.04em;color:var(--muted);background:none;border:0;padding:8px 6px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:#1d2b35;color:var(--ink)}
+.seg button:hover{color:var(--ink)}
+.seg button:focus-visible{outline:2px solid var(--flow);outline-offset:-2px}
+.replay{display:flex;gap:10px;align-items:center}
+.replay button{flex:none;width:34px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font:13px var(--mono)}
+.replay button:focus-visible,.replay input:focus-visible{outline:2px solid var(--flow);outline-offset:2px}
+.replay input{flex:1;accent-color:var(--flow)}
+.rday{font:500 13px var(--mono);color:var(--flow);margin-left:6px;letter-spacing:0;text-transform:none}
+.ticks{display:flex;justify-content:space-between;font:10px var(--mono);color:var(--faint);margin:4px 44px 0 44px}
+.note{font-size:11.5px;color:var(--faint);margin:8px 0 0}
+.detail{flex:1}
+.st{font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;display:flex;gap:8px;align-items:center}
+.detail h2{font:500 22px/1.2 var(--serif);margin:6px 0 12px}
+.kv{display:grid;grid-template-columns:72px 1fr;gap:8px 12px;font-size:13px;margin:0}
+.kv dt{font:500 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding-top:3px}
+.kv dd{margin:0;line-height:1.45}
+.kv code{font:12px var(--mono);color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:11px var(--mono);color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px;flex:none}
+.dot.hollow{background:none!important;border:1.5px solid var(--planned)}
+/* labels in the scene */
+.lbl{font:500 11px var(--mono);color:var(--ink);background:rgba(8,13,18,.82);border:1px solid #243441;border-radius:4px;
+     padding:2px 7px;white-space:nowrap;cursor:pointer;transform:translateY(-24px);user-select:none;transition:opacity .25s}
+.lbl.planned{color:var(--muted);border-style:dashed}
+.lbl.sel{border-color:var(--flow);color:var(--flow)}
+.lbl.core{font-size:12px;padding:3px 8px}
+.plbl{font:600 10.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#7f929d;white-space:nowrap;pointer-events:none;transition:opacity .25s}
+.plbl small{display:block;font:400 10px var(--mono);letter-spacing:.03em;text-transform:none;color:var(--faint)}
+/* flat map */
+section.flat{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.col{border-top:2px solid var(--line);padding-top:12px}
+.col h3{font:500 18px var(--serif);margin:0}
+.col .when{font:11px var(--mono);color:var(--faint);margin:2px 0 10px}
+.row{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:13px}
+.row:hover{color:#fff}.row .mt{font:11px var(--mono);color:var(--muted);text-align:right}
+.row.sel{color:var(--flow)}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;height:auto}
+  .stage{height:62vh;min-height:420px}
+  .side{border-left:0;border-top:1px solid var(--line)}
+  .cols{grid-template-columns:1fr}
+}
+</style>
+
+<div class="app">
+  <div class="stage">
+    <div id="gl" role="img" aria-label="Three stacked planes: Capstone 1, Capstone 2, Later. Each component of the relocation companion is a node coloured by build status; particles run along the request path."></div>
+    <div class="hint">drag to turn · scroll to zoom · click a node</div>
+  </div>
+  <aside class="side">
+    <div class="block">
+      <p class="eyebrow">Relocation companion</p>
+      <h1>Companion Build Map</h1>
+      <p class="lede" id="lede"></p>
+    </div>
+    <div class="block"><p class="eyebrow">Measured by this day</p><div class="metrics" id="metrics"></div></div>
+    <div class="block">
+      <p class="eyebrow">Replay the build<span class="rday" id="rday"></span></p>
+      <div class="replay"><button id="play" aria-label="Play the build day by day">▶</button>
+        <input type="range" id="day" min="0" step="1" aria-label="Day"></div>
+      <div class="ticks" id="ticks"></div>
+      <p class="note">A part counts from the day its code first entered git. From the first saved snapshot on, the snapshots decide.</p>
+    </div>
+    <div class="block">
+      <p class="eyebrow">Focus</p>
+      <div class="seg" id="focus" role="group" aria-label="Layer in focus"></div>
+      <div class="seg" role="group" aria-label="Camera">
+        <button data-view="orbit" aria-pressed="true">Orbit</button>
+        <button data-view="top" aria-pressed="false">From above</button>
+        <button data-view="side" aria-pressed="false">From the side</button>
+      </div>
+    </div>
+    <div class="block detail" id="panel" aria-live="polite"></div>
+    <div class="block legend">
+      <span><i class="dot" style="background:var(--built)"></i>built</span>
+      <span><i class="dot" style="background:var(--partial)"></i>partial</span>
+      <span><i class="dot hollow"></i>planned</span>
+      <span><i class="dot" style="background:var(--flow)"></i>request path</span>
+    </div>
+  </aside>
+</div>
+
+<section class="flat">
+  <p class="eyebrow">The same map, flat</p>
+  <div class="cols" id="cols"></div>
+</section>
+
+<script>const DATA = {"status": {"_about": "Source of truth for build status. architecture/build_map.py checks every evidence path exists and bakes this into build-map.html. Update a node here when it lands; do not edit the HTML. pos is [x, z] on its layer's plane.", "updated": "2026-09-29", "layers": {"c1": {"label": "Capstone 1", "when": "now to Fri 16.10.2026"}, "it2": {"label": "Iteration 2", "when": "capstone 1, after the 02.10 freeze"}, "c2": {"label": "Capstone 2", "when": "February 2027"}, "later": {"label": "Later", "when": "after a first customer"}}, "nodes": [{"id": "family", "label": "Family / visitor", "layer": "c1", "status": "actor", "pos": [-420, 0], "evidence": null, "metric": "the person asking", "next": null, "since": null}, {"id": "chat", "label": "Family companion page", "layer": "c1", "status": "built", "pos": [-300, 0], "evidence": "src/companion/api/static/app.html", "metric": "onboarding · journey · checklist · chat with inspector · on this laptop", "next": "Render still serves the 25.09 page: redeploy with the next export.", "since": "2026-09-28"}, {"id": "api", "label": "FastAPI app", "layer": "c1", "status": "built", "pos": [-180, 0], "evidence": "src/companion/api/app.py", "metric": "/chat · /api/chat · /api/config · /healthz · passcode · rate limit", "next": "Telegram webhook when the channel lands.", "since": "2026-09-21"}, {"id": "guard_in", "label": "Guardrails in", "layer": "c1", "status": "built", "pos": [-60, 0], "evidence": "src/companion/guardrails/crisis.py", "metric": "handoff recall 0.865 local · 0.622 as deployed (Groq) · PII 8/8 · refusal 1.000", "next": "the handover definition is Sean's open call; refusal misses h007, h008 on fresh posts; a hosted llama3.1:8b would close the live gap.", "since": "2026-09-21"}, {"id": "agent", "label": "Agent graph", "layer": "c1", "status": "built", "pos": [70, 0], "core": true, "evidence": "src/companion/agent/graph.py", "metric": "LangGraph, 7 nodes · prompt v3 · router sees the material", "next": "prompt v4 ideas from labelling, 29.09: guiding questions, a PII notice in code, memory, no projecting a card's situation.", "since": "2026-09-21"}, {"id": "guard_out", "label": "Guardrails out", "layer": "c1", "status": "partial", "pos": [200, 0], "evidence": "src/companion/guardrails/groundedness.py", "metric": "bans + groundedness gate live · judged quality unverified", "next": "a blocked answer should send the card passage plus a next step, not a refusal line.", "since": "2026-09-22"}, {"id": "cards", "label": "20 situation cards", "layer": "c1", "status": "built", "pos": [-180, -150], "evidence": "content/cards/card_001_anmeldung_chain.md", "metric": "20 of 20, validated", "next": "the long pole is done. Next cards come from gaps the evals show.", "since": "2026-09-16"}, {"id": "ingest", "label": "Ingest · chunk · embed", "layer": "c1", "status": "built", "pos": [-60, -150], "evidence": "src/companion/retrieval/ingest.py", "metric": "bge-m3 · local Ollama, Hugging Face on Render (parity 0.99999)", "next": null, "since": "2026-09-22"}, {"id": "pg", "label": "Postgres + pgvector", "layer": "c1", "status": "built", "pos": [70, -150], "evidence": "docker-compose.yml", "metric": "local pgvector · Neon Frankfurt for the deploy", "next": null, "since": "2026-09-21"}, {"id": "retrieval", "label": "Retrieval", "layer": "c1", "status": "built", "pos": [200, -150], "evidence": "src/companion/retrieval/store.py", "metric": "tenant-scoped · TF-IDF control", "next": null, "since": "2026-09-21"}, {"id": "llm", "label": "LLM backends", "layer": "c1", "status": "built", "pos": [70, 150], "evidence": "src/companion/llm/ollama.py", "metric": "Ollama Cloud · Groq · Hugging Face · Mistral · local Ollama as the offline fallback", "next": null, "since": "2026-09-21"}, {"id": "obs", "label": "Trace sink", "layer": "c1", "status": "built", "pos": [200, 150], "evidence": "src/companion/obs/sink.py", "metric": "every turn to JSONL", "next": null, "since": "2026-09-22"}, {"id": "evals", "label": "Eval harness", "layer": "c1", "status": "built", "pos": [330, 0], "evidence": "evals/run_generation.py", "metric": "115 cases + 24 held-out · 35 runs · tiers 2 and 3 as deployed, 29.09", "next": "rejudge the two live runs once a judge passes calibration.", "since": "2026-09-22"}, {"id": "baseline0", "label": "Baseline 0", "layer": "c1", "status": "built", "pos": [330, -150], "evidence": "evals/run_baseline0.py", "metric": "hit@1 0.548, no LLM", "next": null, "since": "2026-09-22"}, {"id": "explorer", "label": "Eval Explorer", "layer": "c1", "status": "built", "pos": [330, 150], "evidence": "evals/report.py", "metric": "every case, every run", "next": null, "since": "2026-09-24"}, {"id": "corpus", "label": "Corpus Graph", "layer": "c1", "status": "built", "pos": [330, 290], "evidence": "evals/corpus_graph.py", "metric": "case to card, per run", "next": null, "since": "2026-09-24"}, {"id": "docker", "label": "Docker image", "layer": "c1", "status": "built", "pos": [-300, 150], "evidence": "Dockerfile", "metric": "app + pgvector locally", "next": null, "since": "2026-09-21"}, {"id": "deploy", "label": "Deploy", "layer": "c1", "status": "built", "pos": [-180, 150], "evidence": "render.yaml", "metric": "Render free, Frankfurt · Neon · passcode · build of 25.09", "next": "crisis check is Groq qwen3.8-27b: recall 0.622 vs 0.865 locally, disclosed. The family companion ships with the next deploy.", "since": "2026-09-24"}, {"id": "ci_gate", "label": "CI eval gate", "layer": "c1", "status": "partial", "pos": [-60, 150], "evidence": "quality-gate/github-workflows/evals.yml", "metric": "written, not active", "next": "needs a calibrated judge before its thresholds mean anything.", "since": "2026-09-15"}, {"id": "langfuse", "label": "Langfuse", "layer": "c1", "status": "built", "pos": [200, 290], "evidence": "src/companion/obs/tracing.py", "metric": "self-hosted locally · Cloud EU from Render only", "next": null, "since": "2026-09-24"}, {"id": "telegram", "label": "Telegram", "layer": "it2", "status": "planned", "pos": [-180, 0], "evidence": "src/companion/channels/__init__.py", "metric": "empty stub", "next": "free, no per-message cost.", "since": "2026-07-25"}, {"id": "scheduler", "label": "Scheduler", "layer": "it2", "status": "planned", "pos": [70, 0], "evidence": "src/companion/scheduler/__init__.py", "metric": "empty stub", "next": "the monthly nudge. The real mechanism for the month-four family.", "since": "2026-07-25"}, {"id": "prefect", "label": "Prefect", "layer": "c2", "status": "planned", "pos": [-60, -150], "evidence": null, "metric": "orchestration", "next": null, "since": null}, {"id": "mlflow", "label": "MLflow", "layer": "c2", "status": "planned", "pos": [330, 0], "evidence": null, "metric": "model registry", "next": null, "since": null}, {"id": "grafana", "label": "Prometheus + Grafana", "layer": "c2", "status": "planned", "pos": [-180, 150], "evidence": null, "metric": "golden signals, one alert", "next": null, "since": null}, {"id": "evidently", "label": "Evidently", "layer": "c2", "status": "planned", "pos": [200, 150], "evidence": null, "metric": "input drift", "next": null, "since": null}, {"id": "whatsapp", "label": "WhatsApp", "layer": "later", "status": "planned", "pos": [-180, 0], "evidence": null, "metric": "the cost driver", "next": "per-message pricing since 01.10.2026. Model it before quoting.", "since": null}, {"id": "provider", "label": "Provider dashboard", "layer": "later", "status": "planned", "pos": [70, 0], "evidence": null, "metric": "uptake, flags, consultant queue", "next": null, "since": null}, {"id": "judge", "label": "LLM judge", "layer": "c1", "status": "partial", "pos": [460, 0], "evidence": "evals/judge.py", "metric": "rubric r2, 30 tier-2-live answers: 97% raw agreement on grounded, κ 0.00 / 0.21 / 0.38 at best (gate 0.6)", "next": "kappa paradox: 29 of 30 answers labelled grounded. The sheet needs more 'no' examples, then rejudge.", "since": "2026-09-22"}, {"id": "ui", "label": "Chat UI redesign", "layer": "it2", "status": "built", "pos": [-60, -150], "evidence": "src/companion/api/static/app.css", "metric": "family view · inspector view · handover card · arrival at Kaub", "next": "built 28 and 29.09, on this laptop only until the next deploy.", "since": "2026-09-28"}, {"id": "checklist", "label": "Family checklist", "layer": "it2", "status": "built", "pos": [200, 0], "evidence": "src/companion/api/static/data.js", "metric": "dates count from the moving day · facts from the cards · kept on the device", "next": "the scheduler's reminders will read from it.", "since": "2026-09-28"}, {"id": "memory", "label": "Conversation memory", "layer": "it2", "status": "planned", "pos": [-60, 150], "evidence": "docs/product/prompt-v4-ideas.md", "metric": "the companion forgets the previous message", "next": "found 29.09: history is declared but no node reads it. Needed before guiding questions.", "since": "2026-09-29"}, {"id": "wiki_mcp", "label": "Wiki over MCP · optional", "layer": "it2", "status": "planned", "pos": [200, -150], "evidence": "content/Knowledge layer/00_governance/scope-and-non-goals.md", "metric": "intercultural competence wiki written: 21 files, own gold Q&A · not connected yet", "next": "optional: serve the wiki over MCP as a tool the model chooses to call, and test it against RAG on the same cases.", "since": "2026-09-22"}], "edges": [{"source": "family", "target": "chat", "flow": true}, {"source": "chat", "target": "api", "flow": true}, {"source": "api", "target": "guard_in", "flow": true}, {"source": "guard_in", "target": "agent", "flow": true}, {"source": "agent", "target": "retrieval", "flow": true}, {"source": "retrieval", "target": "pg", "flow": true}, {"source": "agent", "target": "llm", "flow": true}, {"source": "agent", "target": "guard_out", "flow": true}, {"source": "guard_out", "target": "evals", "flow": false}, {"source": "cards", "target": "ingest", "flow": true}, {"source": "ingest", "target": "pg", "flow": true}, {"source": "agent", "target": "obs", "flow": true}, {"source": "obs", "target": "explorer", "flow": true}, {"source": "evals", "target": "explorer", "flow": true}, {"source": "evals", "target": "corpus", "flow": false}, {"source": "baseline0", "target": "evals", "flow": false}, {"source": "obs", "target": "langfuse", "flow": false}, {"source": "docker", "target": "deploy", "flow": false}, {"source": "ci_gate", "target": "evals", "flow": false}, {"source": "telegram", "target": "api", "flow": false}, {"source": "scheduler", "target": "agent", "flow": false}, {"source": "prefect", "target": "ingest", "flow": false}, {"source": "mlflow", "target": "evals", "flow": false}, {"source": "grafana", "target": "api", "flow": false}, {"source": "evidently", "target": "obs", "flow": false}, {"source": "whatsapp", "target": "api", "flow": false}, {"source": "provider", "target": "obs", "flow": false}, {"source": "evals", "target": "judge"}, {"source": "chat", "target": "ui"}, {"source": "checklist", "target": "scheduler"}, {"source": "ui", "target": "checklist"}, {"source": "memory", "target": "agent", "flow": false}, {"source": "wiki_mcp", "target": "agent", "flow": false}]}, "metrics": {"escalation_recall": 0.8649, "escalation_precision": 0.9412, "refusal_correctness": 1.0, "pii_redacted": "8/8", "baseline_hit_at_1": 0.5476, "measured": "2026-09-24"}, "series": [{"run_at": "2026-09-22T08:56:49+00:00", "suite": "baseline-0", "escalation_recall": null, "escalation_precision": null, "refusal_correctness": null, "pii_redacted": null, "answer_hit_at_1": 0.5526}, {"run_at": "2026-09-22T09:01:24+00:00", "suite": "guardrails", "escalation_recall": 0.6585, "escalation_precision": 0.9, "refusal_correctness": 1.0, "pii_redacted": "8/8", "answer_hit_at_1": null}, {"run_at": "2026-09-22T10:14:27+00:00", "suite": "baseline-0", "escalation_recall": null, "escalation_precision": null, "refusal_correctness": null, "pii_redacted": null, "answer_hit_at_1": 0.5526}, {"run_at": "2026-09-23T07:58:18+00:00", "suite": "baseline-0", "escalation_recall": null, "escalation_precision": null, "refusal_correctness": null, "pii_redacted": null, "answer_hit_at_1": 0.5476}, {"run_at": "2026-09-24T08:35:49+00:00", "suite": "guardrails", "escalation_recall": 0.8649, "escalation_precision": 0.9412, "refusal_correctness": 1.0, "pii_redacted": "8/8", "answer_hit_at_1": null}, {"run_at": "2026-09-24T09:59:14+00:00", "suite": "guardrails", "escalation_recall": 0.8649, "escalation_precision": 0.9412, "refusal_correctness": 1.0, "pii_redacted": "8/8", "answer_hit_at_1": null}, {"run_at": "2026-09-24T11:48:58+00:00", "suite": "baseline-0", "escalation_recall": null, "escalation_precision": null, "refusal_correctness": null, "pii_redacted": null, "answer_hit_at_1": 0.5476}, {"run_at": "2026-09-25T09:18:37+00:00", "suite": "guardrails-guard-groq", "escalation_recall": 0.6216, "escalation_precision": 0.9583, "refusal_correctness": 1.0, "pii_redacted": "8/8", "answer_hit_at_1": null}, {"run_at": "2026-09-25T09:25:04+00:00", "suite": "guardrails-guard-groq", "escalation_recall": 0.6216, "escalation_precision": 0.9583, "refusal_correctness": 1.0, "pii_redacted": "8/8", "answer_hit_at_1": null}], "snapshots": [{"date": "2026-09-24", "status": {"family": "actor", "chat": "planned", "api": "partial", "guard_in": "built", "agent": "built", "guard_out": "partial", "cards": "built", "ingest": "built", "pg": "built", "retrieval": "built", "llm": "built", "obs": "built", "evals": "built", "baseline0": "built", "explorer": "built", "corpus": "built", "docker": "built", "deploy": "planned", "ci_gate": "partial", "langfuse": "partial", "telegram": "planned", "scheduler": "planned", "prefect": "planned", "mlflow": "planned", "grafana": "planned", "evidently": "planned", "whatsapp": "planned", "provider": "planned"}}, {"date": "2026-09-28", "status": {"family": "actor", "chat": "built", "api": "built", "guard_in": "built", "agent": "built", "guard_out": "partial", "cards": "built", "ingest": "built", "pg": "built", "retrieval": "built", "llm": "built", "obs": "built", "evals": "built", "baseline0": "built", "explorer": "built", "corpus": "built", "docker": "built", "deploy": "built", "ci_gate": "partial", "langfuse": "built", "telegram": "planned", "scheduler": "planned", "prefect": "planned", "mlflow": "planned", "grafana": "planned", "evidently": "planned", "whatsapp": "planned", "provider": "planned", "judge": "partial", "ui": "planned", "checklist": "planned"}}, {"date": "2026-09-29", "status": {"family": "actor", "chat": "built", "api": "built", "guard_in": "built", "agent": "built", "guard_out": "partial", "cards": "built", "ingest": "built", "pg": "built", "retrieval": "built", "llm": "built", "obs": "built", "evals": "built", "baseline0": "built", "explorer": "built", "corpus": "built", "docker": "built", "deploy": "built", "ci_gate": "partial", "langfuse": "built", "telegram": "planned", "scheduler": "planned", "prefect": "planned", "mlflow": "planned", "grafana": "planned", "evidently": "planned", "whatsapp": "planned", "provider": "planned", "judge": "partial", "ui": "built", "checklist": "built", "memory": "planned", "wiki_mcp": "planned"}}]};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script>
+(() => {
+const {status, metrics} = DATA;
+const nodes = status.nodes, edges = status.edges, byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+const LAYERS = Object.keys(status.layers);
+const LAYER_Y = {c1: 0, it2: 190, c2: 370, later: 540};
+const HEX = {built:0x4fb3a5, partial:0xe6bc4a, planned:0x8494a2, actor:0xdfe4e7, flow:0xffb36b};
+const CSSCOL = {built:"var(--built)", partial:"var(--partial)", planned:"var(--planned)", actor:"var(--actor)"};
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const count = s => nodes.filter(n => n.status === s).length;
+const dmy = s => (s || "").split("-").reverse().join(".");
+
+// ---- sidebar ---------------------------------------------------------
+const f3 = x => x == null ? "–" : x.toFixed(3);
+// ---- replay: what the map looked like on a given day -----------------------------
+const addDay = (d, k) => { const t = new Date(d + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() + k); return t.toISOString().slice(0, 10); };
+const starts = nodes.filter(n => n.since && n.status !== "planned").map(n => n.since).sort();
+const DAYS = []; for (let d = addDay(starts[0] || status.updated, -1); d <= status.updated; d = addDay(d, 1)) DAYS.push(d);
+const snaps = DATA.snapshots || [], series = DATA.series || [];
+function statusAt(n, d){
+  if (n.status === "actor") return "actor";
+  const s = snaps.filter(x => x.date <= d).pop();
+  if (s) return s.status[n.id] || "planned";
+  return (n.status !== "planned" && n.since && n.since <= d) ? n.status : "planned";
+}
+function metricsAt(d){
+  const upto = series.filter(r => (r.run_at || "").slice(0, 10) <= d);
+  const g = upto.filter(r => r.suite === "guardrails").pop() || {}, b = upto.filter(r => r.suite === "baseline-0").pop() || {};
+  // The deployed crisis check (Groq), measured separately since 25.09 and the measured system since 29.09.
+  const l = upto.filter(r => r.suite === "guardrails-guard-groq").pop() || {};
+  return {escalation_recall:g.escalation_recall, escalation_precision:g.escalation_precision, refusal_correctness:g.refusal_correctness,
+          live_recall:l.escalation_recall, live_precision:l.escalation_precision,
+          pii_redacted:g.pii_redacted, baseline_hit_at_1:b.answer_hit_at_1, measured:(g.run_at || b.run_at || "").slice(0, 10)};
+}
+function renderSide(d){
+  const c = k => nodes.filter(n => statusAt(n, d) === k).length;
+  $("lede").textContent = `${c("built")} built · ${c("partial")} partial · ${c("planned")} planned on ${dmy(d)}.`;
+  const m = metricsAt(d);
+  const M = [
+    ["escalation recall", f3(m.escalation_recall), m.escalation_recall != null && m.escalation_recall < .9],
+    ["precision", f3(m.escalation_precision)],
+    ["recall, as deployed", f3(m.live_recall), m.live_recall != null && m.live_recall < .9], ["precision, as deployed", f3(m.live_precision)],
+    ["refusal", f3(m.refusal_correctness)],
+    ["PII redacted", m.pii_redacted ?? "–"], ["baseline hit@1", f3(m.baseline_hit_at_1)],
+    ["measured", m.measured ? dmy(m.measured) : "not yet"]];
+  $("metrics").innerHTML = M.map(([k,v,w]) =>
+    `<div class="m ${w?"warn":""}" ${w?'title="below the 0.90 floor"':""}><b>${esc(v)}</b><span>${k}${w?" · below 0.90":""}</span></div>`).join("");
+  $("rday").textContent = " · " + dmy(d);
+}
+let sceneDay = () => {};
+function setDay(i){ const d = DAYS[i]; $("day").value = i; renderSide(d); sceneDay(d); }
+$("day").max = DAYS.length - 1;
+$("ticks").innerHTML = `<span>${dmy(DAYS[0]).slice(0,5)}</span>${DAYS.includes("2026-09-21") ? "<span>21.09 capstone starts</span>" : ""}<span>${dmy(DAYS.at(-1)).slice(0,5)}</span>`;
+$("day").oninput = e => { stopPlay(); setDay(+e.target.value); };
+let timer = null;
+const stopPlay = () => { clearInterval(timer); timer = null; $("play").textContent = "▶"; };
+$("play").onclick = () => {
+  if (timer) return stopPlay();
+  let i = +$("day").value >= DAYS.length - 1 ? 0 : +$("day").value;
+  setDay(i); $("play").textContent = "❚❚";
+  timer = setInterval(() => { i += 1; if (i >= DAYS.length) return stopPlay(); setDay(i); }, reduced ? 1400 : 750);
+};
+$("focus").innerHTML = [...LAYERS.map(l => [l, status.layers[l].label]), ["all","All"]].map(([id, label]) =>
+  `<button data-focus="${id}" aria-pressed="${id==="c1"}">${esc(label)}</button>`).join("");
+
+const ORDER = {built:0, partial:1, planned:2};
+$("cols").innerHTML = LAYERS.map(lid => {
+  const L = status.layers[lid];
+  const ns = nodes.filter(n => n.layer === lid && n.status !== "actor").sort((a,b) => ORDER[a.status]-ORDER[b.status]);
+  return `<div class="col"><h3>${esc(L.label)}</h3><div class="when">${esc(L.when)}</div>${ns.map(n => `
+    <div class="row" data-id="${n.id}"><i class="dot ${n.status==="planned"?"hollow":""}" style="background:${CSSCOL[n.status]}"></i>
+    <span>${esc(n.label)}</span><span class="mt">${esc(n.metric||"")}</span></div>`).join("")}</div>`;
+}).join("");
+
+function panel(n){
+  const L = status.layers[n.layer];
+  const path = n.evidence ? esc(n.evidence).replace(/\//g, "/<wbr>") : null;
+  $("panel").innerHTML = `<div class="st" style="color:${CSSCOL[n.status]}"><i class="dot ${n.status==="planned"?"hollow":""}" style="background:${CSSCOL[n.status]}"></i>${n.status} · ${esc(L.label)}</div>
+    <h2>${esc(n.label)}</h2><dl class="kv">
+    ${n.metric ? `<dt>state</dt><dd>${esc(n.metric)}</dd>` : ""}
+    <dt>code</dt><dd>${path ? `<code>${path}</code>` : `<span style="color:var(--faint)">nothing yet</span>`}</dd>
+    ${n.next ? `<dt>next</dt><dd>${esc(n.next)}</dd>` : ""}</dl>`;
+  document.querySelectorAll(".row").forEach(r => r.classList.toggle("sel", r.dataset.id === n.id));
+}
+
+let select = id => panel(byId[id]);
+document.querySelectorAll(".row").forEach(r => r.onclick = () => { select(r.dataset.id); scrollTo({top:0, behavior: reduced?"auto":"smooth"}); });
+
+if (!window.THREE || !THREE.OrbitControls || !THREE.CSS2DRenderer) {
+  $("gl").innerHTML = `<p style="padding:200px 26px;color:var(--muted);text-align:center">The 3D view needs three.js from a CDN. The flat map below has everything.</p>`;
+  select("agent"); setDay(DAYS.length - 1); return;
+}
+
+// ---- scene -----------------------------------------------------------
+const host = $("gl");
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x080d12, 1500, 3200);
+const camera = new THREE.PerspectiveCamera(38, 1, 1, 6000);
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+host.appendChild(renderer.domElement);
+const css = new THREE.CSS2DRenderer();
+css.domElement.style.cssText = "position:absolute;inset:0;pointer-events:none";
+host.appendChild(css.domElement);
+scene.add(new THREE.AmbientLight(0xffffff, .5));
+const sun = new THREE.DirectionalLight(0xffffff, .85); sun.position.set(-400, 900, 600); scene.add(sun);
+
+const SPREAD = 1.35, OFFSET_X = -40;
+const P = n => new THREE.Vector3((n.pos[0] + OFFSET_X) * SPREAD, LAYER_Y[n.layer], n.pos[1] * SPREAD);
+
+// soft glow texture, drawn once
+const glowTex = (() => {
+  const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  const r = g.createRadialGradient(64,64,0,64,64,64);
+  r.addColorStop(0,"rgba(255,255,255,.9)"); r.addColorStop(.25,"rgba(255,255,255,.35)"); r.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle = r; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c);
+})();
+
+// what each layer owns, so focus can fade it as one unit
+const L = Object.fromEntries(LAYERS.map(l => [l, {mats:[], labels:[], plane:null}]));
+const fadeable = (lid, mat, base) => { mat.transparent = true; mat.userData.base = base; mat.opacity = base; L[lid].mats.push(mat); return mat; };
+
+for (const lid of LAYERS) {
+  const ns = nodes.filter(n => n.layer === lid), pts = ns.map(P);
+  const pad = 110, x0 = Math.min(...pts.map(p=>p.x))-pad, x1 = Math.max(...pts.map(p=>p.x))+pad;
+  const z0 = Math.min(...pts.map(p=>p.z))-pad, z1 = Math.max(...pts.map(p=>p.z))+pad;
+  const y = LAYER_Y[lid] - 18, w = x1-x0, d = z1-z0, cx = (x0+x1)/2, cz = (z0+z1)/2;
+  const tint = {c1:0x1b4d49, it2:0x1d4450, c2:0x223a4c, later:0x2e2a46}[lid];
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, d),
+    fadeable(lid, new THREE.MeshBasicMaterial({color:tint, side:THREE.DoubleSide, depthWrite:false}), lid==="c1" ? .30 : .22));
+  plane.rotation.x = -Math.PI/2; plane.position.set(cx, y, cz); scene.add(plane);
+  const grid = new THREE.GridHelper(Math.max(w, d), Math.round(Math.max(w, d)/60), tint, tint);
+  grid.scale.set(w/Math.max(w,d), 1, d/Math.max(w,d)); grid.position.set(cx, y+.5, cz);
+  fadeable(lid, grid.material, .35); scene.add(grid);
+  const border = new THREE.LineSegments(new THREE.EdgesGeometry(plane.geometry),
+    fadeable(lid, new THREE.LineBasicMaterial({color:0x4b7a78}), .6));
+  border.rotation.copy(plane.rotation); border.position.copy(plane.position); scene.add(border);
+  const div = document.createElement("div"); div.className = "plbl";
+  div.innerHTML = `${esc(status.layers[lid].label)}<small>${esc(status.layers[lid].when)}</small>`;
+  const tag = new THREE.CSS2DObject(div); tag.position.set(x0 + 18, y, z1 - 14); scene.add(tag);
+  L[lid].plane = {div};
+}
+
+// nodes
+const meshes = [], nodeObj = {}, pulses = [];
+for (const n of nodes) {
+  const r = n.core ? 21 : n.status === "actor" ? 11 : 14, pos = P(n);
+  const mat = n.status === "planned"
+    ? new THREE.MeshBasicMaterial({color:HEX.planned, wireframe:true})
+    : new THREE.MeshStandardMaterial({color:HEX[n.status], emissive:HEX[n.status], emissiveIntensity: n.status==="built" ? .42 : .3, roughness:.4, metalness:.08});
+  fadeable(n.layer, mat, n.status === "planned" ? .55 : 1);
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 22), mat); m.position.copy(pos); m.userData.id = n.id;
+  scene.add(m); meshes.push(m);
+  let glow = null, ghost = null;
+  if (n.status === "built" || n.status === "partial") {
+    const sm = fadeable(n.layer, new THREE.SpriteMaterial({map:glowTex, color:HEX[n.status], blending:THREE.AdditiveBlending, depthWrite:false}), n.status==="built" ? .55 : .7);
+    const s = new THREE.Sprite(sm); s.scale.setScalar(r * 5.2); s.position.copy(pos); scene.add(s); glow = s;
+    if (n.status === "partial") pulses.push({s, base: r * 5.2, phase: Math.random()*6});
+    ghost = fadeable(n.layer, new THREE.MeshBasicMaterial({color:HEX.planned, wireframe:true}), .55);
+  }
+  const div = document.createElement("div");
+  div.className = "lbl" + (n.status === "planned" ? " planned" : "") + (n.core ? " core" : "");
+  div.textContent = n.label; div.style.pointerEvents = "auto"; div.onclick = () => select(n.id);
+  const lab = new THREE.CSS2DObject(div); lab.position.copy(pos).add(new THREE.Vector3(0, r, 0)); scene.add(lab);
+  nodeObj[n.id] = {mesh:m, lab, div, real:mat, ghost, glow}; L[n.layer].labels.push(lab);
+}
+const selRing = new THREE.Mesh(new THREE.RingGeometry(27, 30, 56),
+  new THREE.MeshBasicMaterial({color:HEX.flow, side:THREE.DoubleSide, transparent:true, opacity:.95}));
+selRing.rotation.x = -Math.PI/2; scene.add(selRing);
+
+// edges as gentle arcs; particles ride the same curve
+const flows = [];
+for (const e of edges) {
+  const A = byId[e.source], B = byId[e.target], a = P(A), b = P(B);
+  const cross = A.layer !== B.layer;
+  const mid = a.clone().lerp(b, .5);
+  if (cross) mid.x += 40; else mid.y += Math.min(60, a.distanceTo(b) * .18);
+  const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
+  const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(32));
+  const mat = cross
+    ? new THREE.LineDashedMaterial({color:0x7d8e9c, dashSize:8, gapSize:7})
+    : new THREE.LineBasicMaterial({color: e.flow ? 0x9fd0c8 : 0x55666f});
+  fadeable(A.layer, mat, cross ? .5 : e.flow ? .75 : .45);
+  const line = new THREE.Line(geo, mat); if (cross) line.computeLineDistances(); scene.add(line);
+  if (e.flow && !reduced) for (let k = 0; k < 3; k++) {
+    const pm = fadeable(A.layer, new THREE.SpriteMaterial({map:glowTex, color:HEX.flow, blending:THREE.AdditiveBlending, depthWrite:false}), 1);
+    const p = new THREE.Sprite(pm); p.scale.setScalar(k === 0 ? 16 : 10); scene.add(p);
+    flows.push({p, curve, t: k/3, speed: .0028 + Math.random()*.0012, a:A, b:B});
+  }
+}
+
+// ---- camera ---------------------------------------------------------------
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 260; controls.maxDistance = 2800;
+controls.autoRotate = !reduced; controls.autoRotateSpeed = .35;
+controls.addEventListener("start", () => controls.autoRotate = false);
+let currentView = "orbit", tween = null, focus = "c1";
+const focusY = () => focus === "all" ? LAYER_Y.it2 * 1.4 : LAYER_Y[focus];
+function goTo(view){
+  currentView = view; const y = focusY();
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
+  const pos = {orbit:[-820, y + 700, 1180], top:[-110, y + 1350, 91], side:[-110, y + 40, 1600]}[view];
+  const tgt = {orbit:[-110, y, 90], top:[-110, y, 90], side:[-110, y, 0]}[view];
+  tween = {from:camera.position.clone(), to:new THREE.Vector3(...pos), tf:controls.target.clone(), tt:new THREE.Vector3(...tgt), t: reduced ? 1 : 0};
+  controls.autoRotate = view === "orbit" && !reduced;
+}
+document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => goTo(b.dataset.view));
+
+// ---- focus: one layer sharp, the rest quiet -------------------------------
+function setFocus(f){
+  focus = f;
+  document.querySelectorAll("#focus button").forEach(b => b.setAttribute("aria-pressed", b.dataset.focus === f));
+  for (const lid of LAYERS) {
+    const on = f === "all" || f === lid, k = on ? 1 : .16;
+    L[lid].mats.forEach(m => m.opacity = m.userData.base * k);
+    L[lid].labels.forEach(l => l.element.style.opacity = on ? "1" : "0");
+    L[lid].plane.div.style.opacity = on ? "1" : ".35";
+  }
+  goTo(currentView);
+}
+document.querySelectorAll("#focus button").forEach(b => b.onclick = () => setFocus(b.dataset.focus));
+
+// ---- selection and hover -------------------------------------------------------
+select = id => {
+  const n = byId[id]; if (!n) return;
+  if (focus !== "all" && focus !== n.layer) setFocus(n.layer);
+  Object.entries(nodeObj).forEach(([k, o]) => o.div.classList.toggle("sel", k === id));
+  selRing.position.copy(P(n)).add(new THREE.Vector3(0, -16, 0));
+  panel(n);
+};
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null, hovered = null;
+const pick = e => {
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ptr, camera);
+  return ray.intersectObjects(meshes)[0]?.object.userData.id;
+};
+renderer.domElement.addEventListener("pointerdown", e => down = [e.clientX, e.clientY]);
+renderer.domElement.addEventListener("pointerup", e => {
+  if (!down || Math.hypot(e.clientX-down[0], e.clientY-down[1]) > 5) return;
+  const id = pick(e); if (id) select(id);
+});
+renderer.domElement.addEventListener("pointermove", e => {
+  const id = pick(e);
+  if (hovered && hovered !== id && focus !== "all" && focus !== byId[hovered].layer) nodeObj[hovered].div.style.opacity = "0";
+  if (id) nodeObj[id].div.style.opacity = "1";
+  hovered = id; renderer.domElement.style.cursor = id ? "pointer" : "grab";
+});
+
+// ---- loop --------------------------------------------------------------------
+function size(){
+  const w = host.clientWidth, h = host.clientHeight;
+  camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w, h); css.setSize(w, h);
+}
+addEventListener("resize", size); size();
+camera.position.set(-820, 700, 1180); controls.target.set(-110, 0, 90);
+const clock = new THREE.Clock();
+(function loop(){
+  const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+  if (tween){
+    tween.t = Math.min(1, tween.t + dt*1.5); const k = 1 - Math.pow(1 - tween.t, 3);
+    camera.position.lerpVectors(tween.from, tween.to, k); controls.target.lerpVectors(tween.tf, tween.tt, k);
+    if (tween.t >= 1) tween = null;
+  }
+  for (const f of flows){ f.t = (f.t + f.speed * dt * 60) % 1; f.p.position.copy(f.curve.getPoint(f.t)); }
+  if (!reduced) for (const p of pulses) p.s.scale.setScalar(p.base * (1 + .12*Math.sin(t*2.2 + p.phase)));
+  selRing.rotation.z += dt * .5;
+  controls.update(); renderer.render(scene, camera); css.render(scene, camera);
+  requestAnimationFrame(loop);
+})();
+const live = s => s !== "planned";
+sceneDay = d => {
+  for (const n of nodes) {
+    const o = nodeObj[n.id], s = statusAt(n, d); if (!o.ghost) continue;
+    o.mesh.material = live(s) ? o.real : o.ghost;
+    if (live(s)) { o.real.color.setHex(HEX[s]); o.real.emissive?.setHex(HEX[s]); }
+    o.glow.visible = live(s);
+    o.div.classList.toggle("planned", !live(s));
+  }
+  for (const f of flows) f.p.visible = live(statusAt(f.a, d)) && live(statusAt(f.b, d));
+};
+setFocus("c1"); select("agent"); setDay(DAYS.length - 1);
+})();
+</script>

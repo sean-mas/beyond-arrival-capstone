@@ -1,0 +1,3 @@
+{"query": "I need an activity to build empathy and listening skills for a community dialogue.", "expected_tags": ["empathy", "listening", "unesco", "story circles"], "expected_id": "IC-ACT-002"}
+{"query": "How do I assess tolerance for ambiguity?", "expected_file": "competency-rubrics.yaml", "expected_content_match": "Tolerance for Ambiguity"}
+{"query": "What are the risks of virtual artifact exchange?", "expected_file": "activity-003.yaml", "expected_content_match": "Socioeconomic disparities"}

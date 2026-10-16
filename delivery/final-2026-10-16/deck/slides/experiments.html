@@ -1,0 +1,15 @@
+<section id="experiments" data-transition="fade" style="background:#F5F2EA;color:#1E3A32;font-family:'Nunito Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:28px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#A4501C">Improving it: one change at a time</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:64px;font-weight:700;line-height:1.15">Code and content changes worked. Prompt rules mostly did not.</h2>
+<table style="font-size:28px;color:#1E3A32">
+<tr><th style="width:10%">Step</th><th style="width:50%">Change</th><th style="width:12%">Kind</th><th style="width:28%">Result</th></tr>
+<tr><td>E0</td><td>Same setup run twice</td><td>control</td><td>shows what is chance</td></tr>
+<tr><td>E1, E2</td><td>Drop only unbacked sentences; numbers by value</td><td>code</td><td>kept</td></tr>
+<tr><td>E3</td><td>Clarifying replies see no cards</td><td>code</td><td>kept</td></tr>
+<tr><td>E4</td><td>Five new prompt rules</td><td>prompt</td><td>2 kept, 3 did nothing</td></tr>
+<tr><td>E6</td><td>Two missing facts written into the cards</td><td>content</td><td>both target cases fixed</td></tr>
+<tr><td>E5, E7</td><td>Sharper handoff rules; permit loss goes to a person</td><td>policy</td><td>handoff recall 0.42 → 0.92</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#5E6B65">One change per run, after a control run that shows how much is chance</p>
+<aside>The method matters more than any single result: one change per run, and a control run first, because the same setup run twice already flips a few answers. The pattern across seven experiments: a prompt rule only worked when it changed the shape of the reply. When the model had to know something the cards did not say, no rule helped; writing the fact into the card did. E3 detail: clarifying replies used to borrow phrases from cards about other situations, 6 times; with no cards in view, 0.</aside>
+</section>

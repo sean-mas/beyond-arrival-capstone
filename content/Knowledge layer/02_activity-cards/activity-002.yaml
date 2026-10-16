@@ -1,0 +1,41 @@
+id: IC-ACT-002
+title: "Story Circles: Inclusive Dialogue"
+type: facilitated_activity
+source:
+  source_id: SRC-UNESCO-STORY-CIRCLES-2020
+  locator: "UNESCO Manual"
+  use: "direct application of open framework"
+competencies:
+  - empathy
+  - active_listening
+  - openness
+learning_objectives:
+  - "Practice listening for understanding rather than listening to respond."
+  - "Build personal connections across diverse identities."
+audience:
+  experience_level: [all]
+  settings: [community_dialogue, team_building, higher_education]
+delivery:
+  duration_minutes: 90
+  group_size: "Groups of 4-5"
+  modality: [in_person, online]
+facilitation:
+  preparation: 
+    - "Establish strong ground rules for confidentiality and respect."
+  steps: 
+    - "1. Get acquainted: Brief personal introductions (e.g., name meaning)."
+    - "2. Story sharing prompt: 'Tell us about a time you felt you belonged / didn't belong.' (3 mins each, NO interruptions)."
+    - "3. Flashback: Each person shares a memorable word/phrase from another's story to show they listened."
+  debrief_questions: 
+    - "What was it like to listen without planning your response?"
+    - "What common themes emerged across our different stories?"
+equity_and_safety:
+  risks: ["Emotional vulnerability; power dynamics in mixed-hierarchy corporate groups."]
+  adaptations: ["In high-power-distance teams, consider separating managers and direct reports to ensure psychological safety."]
+evidence:
+  observable_behaviors: ["Demonstrates sustained eye contact/attention; recalls specific details of others' stories."]
+assessment:
+  method: "self-report + peer feedback"
+related:
+  frameworks: [IC-FWK-CORE-001, IC-FWK-CRITICAL-001]
+tags: [empathy, unesco, listening, dialogue]

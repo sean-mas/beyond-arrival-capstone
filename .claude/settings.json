@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-touched.py\"",
+            "timeout": 60,
+            "statusMessage": "ruff"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/test-gate.sh\"",
+            "timeout": 300,
+            "statusMessage": "Running tests before finishing"
+          }
+        ]
+      }
+    ]
+  }
+}

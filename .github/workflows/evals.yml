@@ -1,0 +1,43 @@
+# The slow lane. Spends money and needs API keys, so it is never on every push.
+# Writes evals/results/latest.json, which ci.yml then checks for free.
+name: evals
+
+on:
+  workflow_dispatch:            # run it by hand
+  schedule:
+    - cron: "0 3 * * *"         # nightly
+  pull_request:
+    types: [labeled]            # or add the run-evals label to a PR
+
+jobs:
+  run-evals:
+    if: github.event_name != 'pull_request' || github.event.label.name == 'run-evals'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      # Dev split only. The held-out split is read twice in the whole project,
+      # by hand, and must never be touched by an automated job.
+      - name: Run eval set
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+          LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+        run: python evals/run.py --split dev --out evals/results/latest.json
+
+      - name: Gate
+        run: pytest -q tests/test_eval_gate.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: evals/results/

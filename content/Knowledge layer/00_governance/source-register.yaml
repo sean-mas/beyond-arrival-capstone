@@ -1,0 +1,29 @@
+# Source Register
+sources:
+  - id: SRC-UNESCO-2013
+    title: "Intercultural Competences: Conceptual and Operational Framework"
+    author: "UNESCO"
+    year: 2013
+    type: "Framework"
+    usage: "Foundational definitions, human rights context, inclusive dialogue."
+
+  - id: SRC-BERARDO-DEARDORFF-2012-SYNTHESIS
+    title: "Building Cultural Competence (Methodological Synthesis)"
+    author: "Berardo, K., & Deardorff, D. K."
+    year: 2012
+    type: "Pedagogical Pattern"
+    usage: "Activity structure, debrief methodologies, DAE/OSEE models."
+
+  - id: SRC-UNESCO-STORY-CIRCLES-2020
+    title: "Manual for Developing Intercultural Competencies: Story Circles"
+    author: "Deardorff, D. K. / UNESCO"
+    year: 2020
+    type: "Activity Methodology"
+    usage: "Story circle structure, listening for understanding."
+
+  - id: SRC-VE-COIL-2026
+    title: "2026 State of Virtual Exchange and COIL"
+    author: "Consolidated Research"
+    year: 2026
+    type: "Digital Pedagogy"
+    usage: "Digital and hybrid learning best practices."

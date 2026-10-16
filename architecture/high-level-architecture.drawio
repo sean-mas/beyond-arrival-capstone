@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+  <diagram name="High level" id="highlevel">
+    <mxGraphModel dx="1500" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+
+        <mxCell id="head" value="A year of accompaniment, under the provider&apos;s brand" style="text;html=1;align=left;fontSize=22;fontStyle=1;fontColor=#161D1A" vertex="1" parent="1"><mxGeometry x="60" y="26" width="900" height="32" as="geometry"/></mxCell>
+        <mxCell id="sub" value="Their material. Their consultant. Their logo. Software only changes what delivery costs." style="text;html=1;align=left;fontSize=13;fontColor=#59645F" vertex="1" parent="1"><mxGeometry x="60" y="62" width="900" height="22" as="geometry"/></mxCell>
+
+        <mxCell id="prov" value="THE PROVIDER" style="rounded=1;arcSize=6;html=1;whiteSpace=wrap;fillColor=#F2F4F1;strokeColor=#59645F;verticalAlign=top;align=left;spacingLeft=20;spacingTop=14;fontSize=12;fontStyle=1;fontColor=#59645F" vertex="1" parent="1"><mxGeometry x="60" y="130" width="320" height="430" as="geometry"/></mxCell>
+        <mxCell id="pm" value="Their material&#10;handbooks, checklists, city guides" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#161D1A;fontSize=15;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="90" y="185" width="260" height="76" as="geometry"/></mxCell>
+        <mxCell id="pc" value="Their consultant&#10;takes the moments that need a person" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#A34D26;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="90" y="440" width="260" height="76" as="geometry"/></mxCell>
+        <mxCell id="pd" value="Their dashboard&#10;uptake, flags, what fired" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#161D1A;fontSize=15;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="90" y="300" width="260" height="76" as="geometry"/></mxCell>
+
+        <mxCell id="comp" value="THE COMPANION" style="rounded=1;arcSize=6;html=1;whiteSpace=wrap;fillColor=#EBF4F2;strokeColor=#0D6A60;strokeWidth=3;verticalAlign=top;align=left;spacingLeft=20;spacingTop=14;fontSize=12;fontStyle=1;fontColor=#0D6A60" vertex="1" parent="1"><mxGeometry x="460" y="110" width="480" height="440" as="geometry"/></mxCell>
+        <mxCell id="cu" value="Understand&#10;a trained model names what is going on" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#0D6A60;strokeWidth=2;fontSize=16;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="490" y="175" width="420" height="90" as="geometry"/></mxCell>
+        <mxCell id="ca" value="Answer&#10;from their material, never invented" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#0D6A60;strokeWidth=2;fontSize=16;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="490" y="285" width="420" height="90" as="geometry"/></mxCell>
+        <mxCell id="ce" value="Escalate&#10;when software is the wrong answer" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#A34D26;strokeWidth=2;fontSize=16;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="490" y="395" width="420" height="90" as="geometry"/></mxCell>
+
+        <mxCell id="fam" value="THE FAMILY" style="rounded=1;arcSize=6;html=1;whiteSpace=wrap;fillColor=#F2F4F1;strokeColor=#59645F;verticalAlign=top;align=left;spacingLeft=20;spacingTop=14;fontSize=12;fontStyle=1;fontColor=#59645F" vertex="1" parent="1"><mxGeometry x="1020" y="180" width="320" height="300" as="geometry"/></mxCell>
+        <mxCell id="fw" value="Where they already are&#10;Telegram, or the web" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#161D1A;fontSize=15;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="1050" y="240" width="260" height="80" as="geometry"/></mxCell>
+        <mxCell id="fm" value="Month 1 to month 12&#10;the window nobody owns" style="rounded=1;arcSize=8;html=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#161D1A;fontSize=15;fontStyle=1;fontColor=#161D1A;spacing=4" vertex="1" parent="1"><mxGeometry x="1050" y="350" width="260" height="80" as="geometry"/></mxCell>
+
+        <mxCell id="w1" value="indexed per provider" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#161D1A;strokeWidth=2;fontSize=12;fontColor=#161D1A;labelBackgroundColor=#E9ECE9;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0" edge="1" parent="1" source="pm" target="ca"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="w2" value="checks in, weekly" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#0D6A60;strokeWidth=3;fontSize=12;fontColor=#0D6A60;labelBackgroundColor=#E9ECE9;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0" edge="1" parent="1" source="comp" target="fam"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="w3" value="one tap back" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#0D6A60;strokeWidth=3;fontSize=12;fontColor=#0D6A60;labelBackgroundColor=#E9ECE9;exitX=0;exitY=0.85;exitDx=0;exitDy=0;entryX=1;entryY=0.88;entryDx=0;entryDy=0" edge="1" parent="1" source="fam" target="comp"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="w4" value="under their brand" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#161D1A;strokeWidth=2;fontSize=12;fontColor=#161D1A;labelBackgroundColor=#E9ECE9;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="ca" target="fw"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="w5" value="a named human" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A34D26;strokeWidth=3;fontSize=12;fontColor=#A34D26;labelBackgroundColor=#E9ECE9;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="ce" target="pc"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="w6" value="uptake and flags" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#161D1A;strokeWidth=2;fontSize=12;fontColor=#161D1A;labelBackgroundColor=#E9ECE9;exitX=0;exitY=0.62;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0" edge="1" parent="1" source="comp" target="pd"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="s1" value="1" style="ellipse;html=1;fillColor=#161D1A;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="72" y="167" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s2" value="2" style="ellipse;html=1;fillColor=#0D6A60;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="962" y="158" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s3" value="3" style="ellipse;html=1;fillColor=#0D6A60;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="962" y="480" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s4" value="4" style="ellipse;html=1;fillColor=#0D6A60;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="472" y="157" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s5" value="5" style="ellipse;html=1;fillColor=#0D6A60;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="472" y="267" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s6" value="6" style="ellipse;html=1;fillColor=#A34D26;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="472" y="377" width="36" height="36" as="geometry"/></mxCell>
+        <mxCell id="s7" value="7" style="ellipse;html=1;fillColor=#161D1A;strokeColor=none;fontColor=#FFFFFF;fontSize=15;fontStyle=1" vertex="1" parent="1"><mxGeometry x="72" y="282" width="36" height="36" as="geometry"/></mxCell>
+
+        <mxCell id="narr" value="1  The provider hands over the material they already have.        2  The companion checks in, weekly, one question.        3  The family answers with one tap.        4  A trained model names the situation.&#10;5  The answer comes back out of the provider&apos;s own material.        6  When a person is needed, it goes to the provider&apos;s consultant, not ours.        7  The provider sees what happened, under their own brand." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#161D1A" vertex="1" parent="1"><mxGeometry x="60" y="612" width="1280" height="46" as="geometry"/></mxCell>
+        <mxCell id="caveat" value="Sketch, 2026-09-10. Nothing is built and no provider has replied. G4 closes 2026-10-15 at 1 commitment of 22, time or money (re-registered 14.09.2026, superseding &quot;4 replies of 20&quot;)." style="text;html=1;align=left;fontSize=11;fontColor=#A34D26" vertex="1" parent="1"><mxGeometry x="60" y="666" width="900" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
