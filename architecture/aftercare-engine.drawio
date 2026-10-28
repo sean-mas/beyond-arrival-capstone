@@ -1,0 +1,97 @@
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+  <diagram name="Aftercare engine" id="aftercare-engine">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="bandProvider" value="PROVIDER TENANT — their brand, their client, their DPA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#59645F;dashed=1;dashPattern=5 4;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=10;fontColor=#59645F;fontStyle=0" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="930" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="pEnrol" value="Enrol a seat&#10;on placement" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="55" y="70" width="170" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="pQueue" value="Consultant queue&#10;the human moments" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="410" y="70" width="180" height="46" as="geometry"/>
+        </mxCell>
+        <mxCell id="pDash" value="Dashboard&#10;what fired, uptake" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="790" y="70" width="170" height="46" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="bandEngine" value="SHARED ENGINE — the same code for both ideas" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0D6A60;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=10;fontColor=#0D6A60" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="800" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="eSpine" value="Journey spine&#10;date-driven" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="58" y="218" width="145" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="eCheck" value="Check-in loop&#10;one tap, weekly" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="58" y="296" width="145" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="eRouter" value="Situation router&#10;picks the key" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="280" y="257" width="145" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="eCorpus" value="Card corpus&#10;human-authored" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="482" y="218" width="145" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="ePresent" value="Presenter&#10;phrases only, never invents" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="482" y="296" width="145" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="eDeliver" value="Delivery&#10;mail · chat" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DEE4DE;strokeColor=#161D1A;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="684" y="257" width="145" height="48" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="bandUser" value="END USER&#10;&#10;family: partner, kids&#10;&#10;or hire + manager" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#59645F;dashed=1;dashPattern=5 4;verticalAlign=top;spacingTop=8;fontSize=11;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="870" y="180" width="110" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="packReloc" value="Relocation pack&#10;12 months, no fixed date&#10;origin country × Germany" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#59645F;dashed=1;dashPattern=4 3;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="160" y="440" width="250" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="packProb" value="Probation pack&#10;6 months, review is the date&#10;origin × German workplace" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#59645F;dashed=1;dashPattern=4 3;fontSize=12;fontColor=#161D1A" vertex="1" parent="1">
+          <mxGeometry x="490" y="440" width="250" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="packLabel" value="WHAT DIFFERS — two content packs, two journey templates" style="text;html=1;align=left;fontSize=10;fontColor=#59645F" vertex="1" parent="1">
+          <mxGeometry x="55" y="406" width="400" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="aResell" value="resells it at all&#10;a1 / a2 untested" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#A34D26;strokeWidth=2;fontSize=10;fontColor=#A34D26;exitX=0.4;exitY=1;exitDx=0;exitDy=0;entryX=0.4;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none" edge="1" parent="1" source="pEnrol" target="eSpine">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aSpine" value="m3 · m6 · m9" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="eSpine" target="eRouter">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aCheck" value="how was the week" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="eCheck" target="eRouter">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aKey" value="situation key" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="eRouter" target="eCorpus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aCards" value="cards" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="eCorpus" target="ePresent">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aGrounded" value="grounded text" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="ePresent" target="eDeliver">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aBranded" value="branded" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="eDeliver" target="bandUser">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aFlag" value="risk flag, no match · a3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#A34D26;strokeWidth=2;fontSize=10;fontColor=#A34D26;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none" edge="1" parent="1" source="eRouter" target="pQueue">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aEvents" value="engine events" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none" edge="1" parent="1" source="eDeliver" target="pDash">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aLoad1" value="loads" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="packReloc" target="bandEngine">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="aLoad2" value="loads" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#161D1A;fontSize=10;fontColor=#161D1A;labelBackgroundColor=none" edge="1" parent="1" source="packProb" target="bandEngine">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="Teal boundary = built once, shared by both campaigns.&#10;Clay edges = no evidence behind them yet: a1, a2 and a3 are what the October calls settle.&#10;Nothing here is built. G4 threshold: 1 commitment of 22, time or money, by 2026-10-15 (re-registered 14.09.2026)." style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontColor=#59645F" vertex="1" parent="1">
+          <mxGeometry x="55" y="545" width="700" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

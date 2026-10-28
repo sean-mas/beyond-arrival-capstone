@@ -1,0 +1,71 @@
+# Render Blueprint: the demo, one free web service in Frankfurt. The database
+# is Neon's free tier, outside Render.
+#
+# Decided 24.09.2026, deliberately reversing the 22.09 scope decision that
+# parked deployment for iteration 2. Revised 25.09.2026 after a grilling:
+#
+#   plan: free        Sleeps after 15 minutes idle and takes about a minute to
+#                     wake. Accepted: the link goes to coaches and classmates
+#                     only, behind DEMO_PASSCODE, and Sean opens it before
+#                     presenting. Pay (Starter) the day it goes to a provider.
+#   Neon, not Render  Render's free Postgres expires 30 days after creation
+#                     and is deleted 14 days later. Neon's free tier does not
+#                     expire. Load the cards from the laptop with
+#                     `make ingest-render` (RENDER_DATABASE_URL = the Neon URL).
+#
+# Two things differ from the laptop, both because Render has no local Ollama:
+#
+#   EMBEDDING_PROVIDER=cloudflare   the same bge-m3 weights, on Workers AI (HF until 15.10.2026).
+#                                   `make embed-parity` checks the vectors agree.
+#   GUARD_PROVIDER=groq             qwen3.8-27b as the crisis classifier:
+#                                   recall 0.622 against 0.865 locally. A weaker
+#                                   guard, accepted for this audience and
+#                                   disclosed in the deck. docs/decisions.md.
+#
+# Live traces go to Langfuse Cloud, EU region, free Hobby plan (50k units a
+# month, 30 days kept). Only the redacted message leaves; the laptop's own
+# Langfuse keeps the evals. LANGFUSE_ALLOW_CLOUD is set only here.
+#
+# No Redis: an in-process rate limit of 20 messages per visitor per hour and
+# 150 a day for the site guards the free quotas. When a quota still runs out,
+# the page shows the plain error; there is no hidden fallback.
+#
+# Secrets are `sync: false`: Render asks for them in the dashboard, and they
+# never appear in this file or in git.
+services:
+  - type: web
+    name: beyond-arrival
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: EMBEDDING_PROVIDER
+        value: cloudflare
+      - key: GUARD_PROVIDER
+        value: groq
+      - key: GUARD_MODEL
+        value: qwen/qwen3.8-27b
+      - key: LANGFUSE_ALLOW_CLOUD
+        value: "true"
+      - key: LANGFUSE_BASE_URL
+        value: https://cloud.langfuse.com
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+      - key: OLLAMA_CLOUD_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: DEMO_PASSCODE
+        sync: false

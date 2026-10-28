@@ -1,0 +1,30 @@
+# Local: the app and a Postgres with pgvector. The deployed version uses the
+# platform's managed Postgres instead.
+#
+# Langfuse runs beside this, from docker-compose.langfuse.yml: `make langfuse-up`.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: companion
+      POSTGRES_PASSWORD: companion
+      POSTGRES_DB: companion
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U companion"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://companion:companion@db:5432/companion
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+    volumes: ["./content:/app/content:ro"]
+
+volumes:
+  pgdata:

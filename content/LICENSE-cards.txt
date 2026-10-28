@@ -1,0 +1,4 @@
+The situation cards in content/cards/ are the product's content and are not
+covered by the MIT licence in the repository root, which covers the code.
+
+Copyright (c) 2026 Sean Kress. All rights reserved.
